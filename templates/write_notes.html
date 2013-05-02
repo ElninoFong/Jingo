@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Write Notes</title>
+</head>
+<body>
+	<br>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li style="color: red">{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	{% endwith %}
+	<br>
+	<form action="" method="post">
+		Words:<br>
+		<textarea autofocus name="words" rows="8" cols="30" maxlength="140"></textarea><br>
+		Hyperlink:<br><input name="link" type="url"><br>
+		Location:<br><input name="" type="text"><br>
+		Radius:<br><input name="" type="text"><br>
+		Schedule:<br><input name="" type="text"><br>
+		Tags:<br><input name="" type="text"><br>
+		<input type="submit" />
+	</form>
+</body>
+</html>

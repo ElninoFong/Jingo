@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ title }}</title>
+</head>
+<body>
+	<br>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	{% endwith %}
+	<br>
+	{% if results %}
+		<div>
+			<table border="1">
+				<caption>{{ table }}</caption>
+				<tr>
+				{% for field in fields %}
+				<th>{{ field }}</th>
+				{% endfor %}
+				</tr>
+				{% for res in results %}
+				<tr>
+				{% for col in res %}
+				<td>{{ col }}</td>
+				{% endfor %}
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+		<p>No results.</p>
+	{% endif %}
+</body>
+</html>
