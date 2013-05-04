@@ -14,9 +14,9 @@ user = {'uid': 1,
 		'state_id': 2,
 		'state_name': 'at work'}
 
-state = {'at work',
+state = ['at work',
 		 'lunch break',
-		 'just chilling'}
+		 'just chilling']
 
 dayofweek = [{'day': 'Monday', 'id': 0},
 			 {'day': 'Tuesday', 'id': 1},

@@ -2,14 +2,12 @@
 <html>
 <head>
 <title>Write Notes</title>
-
 <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" media="all" type="text/css" href="/static/jquery-ui-timepicker-addon.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
 <script src="/static/jquery-ui-timepicker-addon.js"></script>
 <script src="/static/jquery-ui-sliderAccess.js"></script>
-
 <script>
 $(document).ready(function(){
 	var startDateTextBox = $('#startdatetime');
@@ -93,6 +91,49 @@ $(document).ready(function(){
 	});
 });
 </script>
+
+<link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+<script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
+<script>
+    var jQuery = jQuery.noConflict();
+    jQuery(function() {
+      jQuery("#jquery-tagbox-text").tagBox();
+      jQuery("#jquery-tagbox-select").tagBox({ 
+        enableDropdown: true, 
+        dropdownSource: function() {
+          return jQuery("#jquery-tagbox-select-options");
+        }
+      });
+      jQuery('#val_show').click(function(){
+        // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
+        // $('#val_para').text("hello");
+        var res = (jQuery("#jquery-tagbox-select").val().split(','));
+        // alert(res[0]);
+        var abc = "";
+        for(var i=0; i<res.length; i++){
+          abc = abc + res[i] + "<br>";
+          jQuery('#val_para').html(abc);
+        }
+      });
+    });
+</script>
+<style type="text/css">
+  body {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 20px;
+  }
+  div.row {
+    padding: 10px;
+  }
+  
+  div.row label {
+    font-weight: bold;
+    display: block;
+    padding: 0px 0px 10px;
+  }
+</style>
 </head>
 <body>
 	<br>
@@ -132,10 +173,26 @@ $(document).ready(function(){
 				<option value={{ dow.id }}>{{ dow.day }}</option>
 				{% endfor %}
 			</select>
-		</div><div>Tags:
 		</div>
-		<input type="submit" /><br>
-		
+		<div class="row">
+      		<label for="jquery-tagbox-text">Tags:</label>
+     		<input type="text" id="jquery-tagbox-text" />
+   		</div><!--div.row-->
+    	<div class="row">
+      		<label for="jquery-tagbox-select">Dropdown TagBox</label>
+      		<select name="" id="jquery-tagbox-select-options">
+        		<option value="jQuery">jQuery</option>
+        		<option value="MooTools">MooTools</option>
+        		<option value="ProtoType">ProtoType</option>
+        		<option value="Scriptaculous">Scriptaculous</option>
+        		<option value="Dojo">Dojo</option>
+      		</select><!--select#-->
+      		<input type="text" id="jquery-tagbox-select" />
+		</div><!--div.row-->
+  		<div><input id="val_show" type="button" value="test button"><br>
+    	<p id="val_para"></p></div>
+    	
+		<br><input type="submit" /><br>
 		<input id ="get_sel_val" type="button" value="test button2">
 	</form>
 </body>

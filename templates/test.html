@@ -7,6 +7,7 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
   <script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
   <script>
+    var jQuery = jQuery.noConflict();
     jQuery(function() {
       jQuery("#jquery-tagbox-text").tagBox();
       jQuery("#jquery-tagbox-select").tagBox({ 
@@ -15,7 +16,7 @@
           return jQuery("#jquery-tagbox-select-options");
         }
       });
-      $('#val_show').click(function(){
+      jQuery('#val_show').click(function(){
         // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
         // $('#val_para').text("hello");
         var res = (jQuery("#jquery-tagbox-select").val().split(','));
@@ -23,7 +24,7 @@
         var abc = "";
         for(var i=0; i<res.length; i++){
           abc = abc + res[i] + "<br>";
-          $('#val_para').html(abc);
+          jQuery('#val_para').html(abc);
         }
       });
     });
