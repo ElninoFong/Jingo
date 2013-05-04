@@ -1,7 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Write Notes</title>
+<title>Write Notes</title>
+
+<link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" media="all" type="text/css" href="/static/jquery-ui-timepicker-addon.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
+<script src="/static/jquery-ui-timepicker-addon.js"></script>
+<script src="/static/jquery-ui-sliderAccess.js"></script>
+
+<script>
+$(document).ready(function(){
+	var startDateTextBox = $('#startdatetime');
+	var endDateTextBox = $('#enddatetime');
+	var startTimeTextBox = $('#starttime');
+	var endTimeTextBox = $('#endtime');
+	startDateTextBox.datetimepicker({ 
+			onClose: function(dateText, inst) {
+				if (endDateTextBox.val() != '') {
+					var testStartDate = startDateTextBox.datetimepicker('getDate');
+					var testEndDate = endDateTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						endDateTextBox.datetimepicker('setDate', testStartDate);
+				} else { endDateTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate') );
+			}
+	});
+	endDateTextBox.datetimepicker({ 
+			onClose: function(dateText, inst) {
+				if (startDateTextBox.val() != '') {
+					var testStartDate = startDateTextBox.datetimepicker('getDate');
+					var testEndDate = endDateTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						startDateTextBox.datetimepicker('setDate', testEndDate);
+				} else { startDateTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+			}
+	});
+	startDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+	endDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+	startTimeTextBox.timepicker({ 
+			onClose: function(dateText, inst) {
+				if (endTimeTextBox.val() != '') {
+					var testStartDate = startTimeTextBox.datetimepicker('getDate');
+					var testEndDate = endTimeTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						endTimeTextBox.datetimepicker('setDate', testStartDate);
+				} else { endTimeTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				endTimeTextBox.datetimepicker('option', 'minDate', startTimeTextBox.datetimepicker('getDate') );
+			}
+	});
+	endTimeTextBox.timepicker({ 
+			onClose: function(dateText, inst) {
+				if (startTimeTextBox.val() != '') {
+					var testStartDate = startTimeTextBox.datetimepicker('getDate');
+					var testEndDate = endTimeTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						startTimeTextBox.datetimepicker('setDate', testEndDate);
+				} else { startTimeTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				startTimeTextBox.datetimepicker('option', 'maxDate', endTimeTextBox.datetimepicker('getDate') );
+			}
+	});
+	$('#repeat_sel').change(function(){
+		if($('#repeat_sel').val() == 0) {
+			$('#dow_sel').hide();
+			$('#datetime').show();
+			$('#time').hide();
+		} else if($('#repeat_sel').val() == 2) {
+			$('#dow_sel').show();
+			$('#datetime').hide();
+			$('#time').show();
+		} else {
+			$('#dow_sel').hide();
+			$('#datetime').hide();
+			$('#time').show();
+		}
+	});
+
+	$('#get_sel_val').click(function(){
+		// alert($('#repeat_sel').val());
+		// $(this).hide();
+		alert($('#starttime').val());
+	});
+});
+</script>
 </head>
 <body>
 	<br>
@@ -15,15 +106,37 @@
 	{% endif %}
 	{% endwith %}
 	<br>
+	<div>Username: {{ user.username }}</div>
+	<div>Current State: {{ user.state_name }}</div><br>
 	<form action="" method="post">
 		Words:<br>
 		<textarea autofocus name="words" rows="8" cols="30" maxlength="140"></textarea><br>
 		Hyperlink:<br><input name="link" type="url"><br>
 		Location:<br><input name="" type="text"><br>
 		Radius:<br><input name="" type="text"><br>
-		Schedule:<br><input name="" type="text"><br>
-		Tags:<br><input name="" type="text"><br>
-		<input type="submit" />
+		<div>Schedule:
+			<select id="repeat_sel">
+				{% for rep in repeat %}
+				<option value={{ rep.id }}>{{ rep.type }}</option>
+				{% endfor %}
+			</select>
+			<span id="datetime">
+			<input type="text" id="startdatetime" value=""> 
+			<input type="text" id="enddatetime" value="">
+			</span><span id="time" style="display:none">
+			<input type="text" id="starttime" value=""> 
+			<input type="text" id="endtime" value="">
+			</span>
+			<select id="dow_sel" style="display:none">
+				{% for dow in dayofweek %}
+				<option value={{ dow.id }}>{{ dow.day }}</option>
+				{% endfor %}
+			</select>
+		</div><div>Tags:
+		</div>
+		<input type="submit" /><br>
+		
+		<input id ="get_sel_val" type="button" value="test button2">
 	</form>
 </body>
 </html>

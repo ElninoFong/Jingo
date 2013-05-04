@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>State & Filter</title>
+</head>
+<body>
+	<br>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	{% endwith %}
+	<br>
+	<div>Username: {{ user.username }}</div>
+	<div>Current State: {{ user.state_name }}</div><br>
+	<form action="" method="post">
+		Change State: 
+		<select name="selstate">
+			<option></option>
+			{% for s in state %}
+			<option>{{ s }}</option>
+			{% endfor %}
+		</select><br>
+		OR New State: <input type="text" name="newstate">
+		<input type="submit">
+	</form>
+</body>
+</html>

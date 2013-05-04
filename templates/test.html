@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html lang="en-IN">
+<head>
+  <meta charset="UTF-8">
+  <title>jQuery TagBox Plugin</title>
+  <link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+  <script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
+  <script>
+    jQuery(function() {
+      jQuery("#jquery-tagbox-text").tagBox();
+      jQuery("#jquery-tagbox-select").tagBox({ 
+        enableDropdown: true, 
+        dropdownSource: function() {
+          return jQuery("#jquery-tagbox-select-options");
+        }
+      });
+      $('#val_show').click(function(){
+        // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
+        // $('#val_para').text("hello");
+        var res = (jQuery("#jquery-tagbox-select").val().split(','));
+        // alert(res[0]);
+        var abc = "";
+        for(var i=0; i<res.length; i++){
+          abc = abc + res[i] + "<br>";
+          $('#val_para').html(abc);
+        }
+      });
+    });
+  </script>
+  <style type="text/css">
+  body {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 20px;
+  }
+  div.row {
+    padding: 10px;
+  }
+  
+  div.row label {
+    font-weight: bold;
+    display: block;
+    padding: 0px 0px 10px;
+  }
+  </style>
+</head>
+<body>
+  <h1>jQuery TagBox 1.0.1</h1>
+  <form action=".">
+    <div class="row">
+      <label for="jquery-tagbox-text">Text TagBox (Comma Separated)</label>
+      <input type="text" id="jquery-tagbox-text" />
+    </div><!--div.row-->
+    <div class="row">
+      <label for="jquery-tagbox-select">Dropdown TagBox</label>
+      <select name="" id="jquery-tagbox-select-options">
+        <option value="jQuery">jQuery</option>
+        <option value="MooTools">MooTools</option>
+        <option value="ProtoType">ProtoType</option>
+        <option value="Scriptaculous">Scriptaculous</option>
+        <option value="Dojo">Dojo</option>
+      </select><!--select#-->
+      <input type="text" id="jquery-tagbox-select" />
+    </div><!--div.row-->
+  </form>
+  <div><input id="val_show" type="button" value="test button"><br>
+    <p id="val_para"></p></div>
+</body>
+</html>
