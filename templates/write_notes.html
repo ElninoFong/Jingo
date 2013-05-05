@@ -100,6 +100,7 @@ $(document).ready(function(){
     jQuery(function() {
       jQuery("#jquery-tagbox-text").tagBox();
       jQuery("#jquery-tagbox-select").tagBox({ 
+      	tagButtonTitle: "SELECT TAG",
         enableDropdown: true, 
         dropdownSource: function() {
           return jQuery("#jquery-tagbox-select-options");
@@ -108,13 +109,16 @@ $(document).ready(function(){
       jQuery('#val_show').click(function(){
         // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
         // $('#val_para').text("hello");
-        var res = (jQuery("#jquery-tagbox-select").val().split(','));
-        // alert(res[0]);
+        var res1 = jQuery("#jquery-tagbox-select").val().split(',');
+        var res2 = jQuery("#jquery-tagbox-text").val().split(',');
         var abc = "";
-        for(var i=0; i<res.length; i++){
-          abc = abc + res[i] + "<br>";
-          jQuery('#val_para').html(abc);
+        for(var i=0; i<res1.length; i++){
+          abc = abc + res1[i] + "<br>";
         }
+        for(var i=0; i<res2.length; i++){
+          abc = abc + res2[i] + "<br>";
+        }
+        jQuery('#val_para').html(abc);
       });
     });
 </script>
@@ -149,24 +153,26 @@ $(document).ready(function(){
 	<br>
 	<div>Username: {{ user.username }}</div>
 	<div>Current State: {{ user.state_name }}</div><br>
-	<form action="" method="post">
-		Words:<br>
-		<textarea autofocus name="words" rows="8" cols="30" maxlength="140"></textarea><br>
-		Hyperlink:<br><input name="link" type="url"><br>
-		Location:<br><input name="" type="text"><br>
-		Radius:<br><input name="" type="text"><br>
-		<div>Schedule:
+	<form action="{{ url_for('write_notes') }}" method="post">
+		<div class="row">
+			Words:<br>
+			<textarea autofocus name="words" rows="8" cols="30" maxlength="140"></textarea><br>
+		</div>
+		<div class="row">Hyperlink:<input name="link" type="url"></div>
+		<div class="row">Location:<input name="" type="text">
+			Radius:<input name="" type="text"></div>
+		<div class="row">Schedule:
 			<select id="repeat_sel">
 				{% for rep in repeat %}
 				<option value={{ rep.id }}>{{ rep.type }}</option>
 				{% endfor %}
 			</select>
 			<span id="datetime">
-			<input type="text" id="startdatetime" value=""> 
-			<input type="text" id="enddatetime" value="">
+			<input type="text" id="startdatetime" name="startdatetime" value=""> 
+			<input type="text" id="enddatetime" name="enddatetime" value="">
 			</span><span id="time" style="display:none">
-			<input type="text" id="starttime" value=""> 
-			<input type="text" id="endtime" value="">
+			<input type="text" id="starttime" name="starttime" value=""> 
+			<input type="text" id="endtime" name="endtime" value="">
 			</span>
 			<select id="dow_sel" style="display:none">
 				{% for dow in dayofweek %}
@@ -175,23 +181,18 @@ $(document).ready(function(){
 			</select>
 		</div>
 		<div class="row">
-      		<label for="jquery-tagbox-text">Tags:</label>
-     		<input type="text" id="jquery-tagbox-text" />
-   		</div><!--div.row-->
-    	<div class="row">
-      		<label for="jquery-tagbox-select">Dropdown TagBox</label>
+      		<label for="jquery-tagbox-select">Select Or Add New Tags:</label>
       		<select name="" id="jquery-tagbox-select-options">
-        		<option value="jQuery">jQuery</option>
-        		<option value="MooTools">MooTools</option>
-        		<option value="ProtoType">ProtoType</option>
-        		<option value="Scriptaculous">Scriptaculous</option>
-        		<option value="Dojo">Dojo</option>
+      			{% for tag in tags %}
+				<option value={{ tag.name }}>{{ tag.name }}</option>
+				{% endfor %}
       		</select><!--select#-->
-      		<input type="text" id="jquery-tagbox-select" />
+      		<input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select"><br><br>
+     		<input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
 		</div><!--div.row-->
   		<div><input id="val_show" type="button" value="test button"><br>
     	<p id="val_para"></p></div>
-    	
+
 		<br><input type="submit" /><br>
 		<input id ="get_sel_val" type="button" value="test button2">
 	</form>

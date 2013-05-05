@@ -30,6 +30,12 @@ repeat = [{'type': 'Never', 'id': 0},
 		  {'type': 'Every Day', 'id': 1},
 		  {'type': 'Every Week', 'id': 2}]
 
+tags = [{'id': 1, 'name': 'shopping'},
+		{'id': 2, 'name': 'food'},
+		{'id': 3, 'name': 'tourism'},
+		{'id': 4, 'name': 'transportation'},
+		{'id': 5, 'name': 'me'}]
+
 def connect_db():
 	return mdb.connect('127.0.0.1', 'root', 'root', 
 		'Jingo_DB', port=8889);
@@ -61,20 +67,22 @@ def show_all_notes():
 @app.route('/write_notes', methods=['GET', 'POST'])
 def write_notes():
 	if request.method == 'POST':
-		if request.form['words']:
+		if not request.form['words']:
+			flash("Please input some words.")
+		elif not ((request.form['startdatetime'] and request.form['enddatetime']) or (request.form['starttime'] and request.form['endtime'])):
+			flash("Schedule is required.")
+		else:
 			cur = g.db.cursor()
 			query_add = "INSERT INTO NOTE (uid, words) VALUES (%s, %s)"
 			cur.execute(query_add, (user['uid'], request.form['words']))
 			g.db.commit()
-			# flash(request.form['words'])
 			flash("Write a new note.")
 			return redirect(url_for("show_all_notes"))
-		else:
-			flash("Invalid input.")
 	return render_template('write_notes.html',
 		user = user,
 		dayofweek = dayofweek,
-		repeat = repeat)
+		repeat = repeat,
+		tags = tags)
 
 @app.route('/recieve_notes')
 def recieve_notes():
@@ -111,7 +119,7 @@ def my_notes():
 @app.route('/filter', methods=['GET', 'POST'])
 def filter():
 	if request.method == 'POST':
-		if request.form['newstate'] != '':
+		if request.form['newstate']:
 			if request.form['newstate'] not in state:
 				state.append(request.form['newstate'])
 				user['state_name'] = request.form['newstate']
@@ -119,7 +127,7 @@ def filter():
 			else: 
 				user['state_name'] = request.form['newstate']
 				flash("State Changed")
-		elif request.form['selstate'] != '':
+		elif request.form['selstate']:
 			user['state_name'] = request.form['selstate']
 			flash("State Changed")
 		else:
