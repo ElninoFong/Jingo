@@ -1,10 +1,12 @@
 from flask import Flask, render_template, g, flash, request, redirect, url_for
 import MySQLdb as mdb
 from datetime import datetime
+from dbprocess import dbprocess
+from config import state, dayofweek, repeat, tags
 
-SECRET_KEY = 'development key'
 app = Flask(__name__)
-app.config.from_object(__name__)
+app.config.from_object('config')
+process = dbprocess()
 
 user = {'uid': 1,
 		'username': 'James',
@@ -13,28 +15,6 @@ user = {'uid': 1,
 		'last_loc_name': 'soho',
 		'state_id': 2,
 		'state_name': 'at work'}
-
-state = ['at work',
-		 'lunch break',
-		 'just chilling']
-
-dayofweek = [{'day': 'Monday', 'id': 0},
-			 {'day': 'Tuesday', 'id': 1},
-			 {'day': 'Wednesday', 'id': 2},
-			 {'day': 'Thursday', 'id': 3},
-			 {'day': 'Friday', 'id': 4},
-			 {'day': 'Saturday', 'id': 5},
-			 {'day': 'Sunday', 'id': 6}]
-
-repeat = [{'type': 'Never', 'id': 0},
-		  {'type': 'Every Day', 'id': 1},
-		  {'type': 'Every Week', 'id': 2}]
-
-tags = [{'id': 1, 'name': 'shopping'},
-		{'id': 2, 'name': 'food'},
-		{'id': 3, 'name': 'tourism'},
-		{'id': 4, 'name': 'transportation'},
-		{'id': 5, 'name': 'me'}]
 
 def connect_db():
 	return mdb.connect('127.0.0.1', 'root', 'root', 
@@ -66,23 +46,37 @@ def show_all_notes():
 
 @app.route('/write_notes', methods=['GET', 'POST'])
 def write_notes():
+	form_content = {'words': '',
+					'startdatetime': '',
+					'enddatetime': '',
+					'starttime': '',
+					'endtime': '',
+					'selecttag': '',
+					'addtag': ''}
 	if request.method == 'POST':
 		if not request.form['words']:
 			flash("Please input some words.")
 		elif not ((request.form['startdatetime'] and request.form['enddatetime']) or (request.form['starttime'] and request.form['endtime'])):
+			form_content['words'] = request.form['words']
 			flash("Schedule is required.")
+		elif not (request.form['jquery-tagbox-select'] or request.form['jquery-tagbox-text']):
+			form_content['words'] = request.form['words']
+			flash("Tag is required.")
 		else:
-			cur = g.db.cursor()
-			query_add = "INSERT INTO NOTE (uid, words) VALUES (%s, %s)"
-			cur.execute(query_add, (user['uid'], request.form['words']))
-			g.db.commit()
-			flash("Write a new note.")
+			selecttag = request.form['jquery-tagbox-select'].split(',')
+			addtag = request.form['jquery-tagbox-text'].split(',')
+			process.insert_note(uid = user['uid'], words = request.form['words'], link=None,
+								loc_id=None, radius=None, repeat=request.form['repeat_sel'],
+								startdatetime=request.form['startdatetime'], enddatetime=request.form['enddatetime'],
+								starttime=request.form['starttime'], endtime=request.form['endtime'],
+								dow=request.form['dow_sel'], selecttag=selecttag, addtag=addtag)
 			return redirect(url_for("show_all_notes"))
 	return render_template('write_notes.html',
 		user = user,
 		dayofweek = dayofweek,
 		repeat = repeat,
-		tags = tags)
+		tags = tags,
+		form_content = form_content)
 
 @app.route('/recieve_notes')
 def recieve_notes():

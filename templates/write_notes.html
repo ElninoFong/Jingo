@@ -156,13 +156,13 @@ $(document).ready(function(){
 	<form action="{{ url_for('write_notes') }}" method="post">
 		<div class="row">
 			Words:<br>
-			<textarea autofocus name="words" rows="8" cols="30" maxlength="140"></textarea><br>
+			<textarea autofocus name="words" rows="8" cols="30" maxlength="140">{{ form_content.words }}</textarea><br>
 		</div>
 		<div class="row">Hyperlink:<input name="link" type="url"></div>
 		<div class="row">Location:<input name="" type="text">
 			Radius:<input name="" type="text"></div>
 		<div class="row">Schedule:
-			<select id="repeat_sel">
+			<select id="repeat_sel", name="repeat_sel">
 				{% for rep in repeat %}
 				<option value={{ rep.id }}>{{ rep.type }}</option>
 				{% endfor %}
@@ -174,7 +174,7 @@ $(document).ready(function(){
 			<input type="text" id="starttime" name="starttime" value=""> 
 			<input type="text" id="endtime" name="endtime" value="">
 			</span>
-			<select id="dow_sel" style="display:none">
+			<select id="dow_sel" name='dow_sel' style="display:none">
 				{% for dow in dayofweek %}
 				<option value={{ dow.id }}>{{ dow.day }}</option>
 				{% endfor %}
