@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Place searches</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&libraries=places"></script>
+    <script>
+var map;
+var infowindow;
+
+
+function init() { 
+console.log("entering the init() method"); 
+if (navigator.geolocation) { 
+console.log(' Browser support geolocation '); 
+navigator.geolocation.getCurrentPosition(show_map,handle_error ,null); 
+} else { 
+console.log(' Browser doesnt support geolocation '); 
+} 
+ 
+} 
+
+function handle_error(error){ 
+var errorTypes={ 
+1:'位置服务被拒绝', 
+2:'获取不到位置信息', 
+3:'获取信息超时' 
+}; 
+console.log(errorTypes[error.code] + ":,不能确定你的当前地理位置"); 
+} 
+
+
+function show_map(position) { 
+var coords = position.coords; 
+var curloc=document.getElementById("curloc"); 
+var geocoder = new google.maps.Geocoder();
+
+var latlng = new google.maps.LatLng( coords.latitude, coords.longitude);
+
+initialize(latlng);
+geocoder.geocode({'location': latlng}, function(results, status) {
+  if (status == google.maps.GeocoderStatus.OK) {
+  if (results[0]) {
+	  document.getElementById("curloc").value =results[0].formatted_address+';' + coords.latitude+';'+coords.longitude;
+  } 
+} else {
+	alert("Geocoder failed due to: " + status);
+}
+});
+
+
+}
+
+
+function initialize(pyrmont) {
+	
+  //var pyrmont = cityToLatLng("new york");
+//  alert(pyrmont);
+  if(pyrmont == null) return;
+  //new google.maps.LatLng(-33.8665433, 151.1956316);
+
+  map = new google.maps.Map(document.getElementById('map-canvas'), {
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    center: pyrmont,
+    zoom: 15
+  });
+
+  var request = {
+    location: pyrmont,
+    radius: 500,
+    types: ['store']
+  };
+  infowindow = new google.maps.InfoWindow();
+  var service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(request, callback);
+}
+
+function callback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < 10; i++) {
+      createMarker(results[i]);
+	  
+    }
+
+ document.getElementById("0").value=results[0].name+';'+results[0].geometry.location.lat()+';'+results[0].geometry.location.lng()
+	 document.getElementById("1").value=results[1].name+';'+results[1].geometry.location.lat()+';'+results[1].geometry.location.lng()
+	 document.getElementById("2").value=results[2].name+';'+results[2].geometry.location.lat()+';'+results[2].geometry.location.lng()
+	 document.getElementById("3").value=results[3].name+';'+results[3].geometry.location.lat()+';'+results[3].geometry.location.lng()
+	 document.getElementById("4").value=results[4].name+';'+results[4].geometry.location.lat()+';'+results[4].geometry.location.lng()
+	 document.getElementById("5").value=results[5].name+';'+results[5].geometry.location.lat()+';'+results[5].geometry.location.lng()
+	 document.getElementById("6").value=results[6].name+';'+results[6].geometry.location.lat()+';'+results[6].geometry.location.lng()
+	 document.getElementById("7").value=results[7].name+';'+results[7].geometry.location.lat()+';'+results[7].geometry.location.lng()
+	 document.getElementById("8").value=results[8].name+';'+results[8].geometry.location.lat()+';'+results[8].geometry.location.lng()
+
+	 document.getElementById("9").value=results[9].name+';'+results[7].geometry.location.lat()+';'+results[9].geometry.location.lng()
+	
+  }
+}
+
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(place.name);
+      infowindow.open(map, this);
+    });
+}
+
+google.maps.event.addDomListener(window, 'load', init );
+
+
+
+function onloadCity(value) {
+//	alert(value);
+	cityToLatLng(value);
+}
+
+function cityToLatLng(city){
+	var inilocation = new google.maps.LatLng(40.69419868648126,-73.98724016591011);
+
+	map = new google.maps.Map(document.getElementById('map-canvas'), {
+	  mapTypeId: google.maps.MapTypeId.ROADMAP,
+	  center: inilocation,
+	  zoom: 15
+	});
+	
+	var geocoder = new google.maps.Geocoder();
+	return geocoder.geocode({address:city}, geoResults);
+}
+
+
+function geoResults(results, status){
+
+	  if (status == google.maps.GeocoderStatus.OK) {
+	 		initialize(results[0].geometry.location);
+		
+	  }else{
+	    alert("you have to input !");
+	  }
+  }
+  
+  
+  
+function reciveloc(loc){
+	
+	 window.returnValue = loc ;
+     window.close(); 
+
+}
+
+
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas" style="width: 50%; float:left"></div>
+    <div style="width:46%; float:left">
+      <pre>
+<form id="loadconfigform">
+search: <input  type="text" id="configname" name="configname" /><input type="button" value="Submit"
+		     onclick="onloadCity(document.getElementById('configname').value);" />
+</form>
+		  
+current loction :
+<input type="text" id="curloc" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('curloc').value);">
+nearby:
+<input type="text" id="0" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('0').value);">
+<input type="text" id="1" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('1').value);">
+<input type="text" id="2" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('2').value);">
+<input type="text" id="3" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('3').value);">
+<input type="text" id="4" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('4').value);">
+<input type="text" id="5" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('5').value);">
+<input type="text" id="6" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('6').value);">
+<input type="text" id="7" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('7').value);">
+<input type="text" id="8" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('8').value);">
+<input type="text" id="9" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('9').value);">
+
+
+
+      </pre>
+  </body>
+</html>
