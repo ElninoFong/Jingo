@@ -13,7 +13,6 @@ class dbprocess():
 		if (repeat == '0'):	# Never repeat
 			start = str(startdatetime) + ':00'
 			end = str(enddatetime) + ':00'
-			# flash("startdatetime: " + start)
 		else:	# Every Day or Every Week
 			start = str(date.today()) + ' ' + str(starttime) + ':00'
 			end = str(date.today()) + ' ' + str(endtime) + ':00'
@@ -21,7 +20,6 @@ class dbprocess():
 					VALUES (%s, %s, %s ,%s)"
 		cur.execute(query_add_schedule, (start, end, repeat, dow))
 		schedule_id = g.db.insert_id()
-		# g.db.commit()
 		flash("Add new schedule: " + str(schedule_id))
 
 		#add tag
@@ -29,22 +27,18 @@ class dbprocess():
 		for a in addtag:	# remove same tags
 			if a in selecttag:
 				addtag.remove(a)
-				# flash("remove add tag: " + a)
 		for s in selecttag:	# predefined tag id
 			for row in tags:
 				if s in row['name']:
-					# flash("tags['name']: " + row['name'] + ", tags['id']: " + str(row['id']))
 					tag_id.append(row['id'])
-		if addtag:
+		if addtag and addtag[0] is not u'': 	# use this condition for unicode empty list
 			query_show_tag = "SELECT * FROM TAG"
 			cur.execute(query_show_tag)
 			results = cur.fetchall()
 			for a in addtag:
 				exist = False
 				for i,n in results:
-					# flash("a: " + a + ", n: " + n)
 					if a == n:	# exist
-						# flash("exist: " + a)
 						tag_id.append(i)
 						exist = True
 						break
@@ -52,14 +46,12 @@ class dbprocess():
 					query_add_tag = "INSERT INTO TAG (tag_name) VALUES (%s)"
 					cur.execute(query_add_tag, (a))
 					tag_id.append(g.db.insert_id())
-					# g.db.commit()
 
 		#add note
 		query_add_note = "INSERT INTO NOTE (uid, words, hyperlink, location_id, radius, schedule_id) \
 				VALUES (%s, %s, %s, %s, %s, %s)"
 		cur.execute(query_add_note, (uid, words, link, loc_id, radius, schedule_id))
 		note_id = g.db.insert_id()
-		# g.db.commit()
 		flash("Write a new note: " + str(note_id))
 		# flash(cur.lastrowid)
 
