@@ -49,10 +49,7 @@ geocoder.geocode({'location': latlng}, function(results, status) {
 	alert("Geocoder failed due to: " + status);
 }
 });
-
-
 }
-
 
 function initialize(pyrmont) {
 	
@@ -84,7 +81,7 @@ function callback(results, status) {
 	  
     }
 
- document.getElementById("0").value=results[0].name+';'+results[0].geometry.location.lat()+';'+results[0].geometry.location.lng()
+   document.getElementById("0").value=results[0].name+';'+results[0].geometry.location.lat()+';'+results[0].geometry.location.lng()
 	 document.getElementById("1").value=results[1].name+';'+results[1].geometry.location.lat()+';'+results[1].geometry.location.lng()
 	 document.getElementById("2").value=results[2].name+';'+results[2].geometry.location.lat()+';'+results[2].geometry.location.lng()
 	 document.getElementById("3").value=results[3].name+';'+results[3].geometry.location.lat()+';'+results[3].geometry.location.lng()
@@ -93,7 +90,6 @@ function callback(results, status) {
 	 document.getElementById("6").value=results[6].name+';'+results[6].geometry.location.lat()+';'+results[6].geometry.location.lng()
 	 document.getElementById("7").value=results[7].name+';'+results[7].geometry.location.lat()+';'+results[7].geometry.location.lng()
 	 document.getElementById("8").value=results[8].name+';'+results[8].geometry.location.lat()+';'+results[8].geometry.location.lng()
-
 	 document.getElementById("9").value=results[9].name+';'+results[7].geometry.location.lat()+';'+results[9].geometry.location.lng()
 	
   }
@@ -163,7 +159,7 @@ function reciveloc(loc){
     <div style="width:46%; float:left">
       <pre>
 <form id="loadconfigform">
-search: <input  type="text" id="configname" name="configname" /><input type="button" value="Submit"
+search: <input type="text" id="configname" name="configname" /><input type="button" value="Submit"
 		     onclick="onloadCity(document.getElementById('configname').value);" />
 </form>
 		  

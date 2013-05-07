@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Write Notes</title>
+<!-- Schedule -->
 <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" media="all" type="text/css" href="/static/jquery-ui-timepicker-addon.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -91,7 +92,7 @@ $(document).ready(function(){
 	});
 });
 </script>
-
+<!-- Tags -->
 <link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
 <script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
@@ -138,6 +139,16 @@ $(document).ready(function(){
     padding: 0px 0px 10px;
   }
 </style>
+<!-- Location -->
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+function openwin() {
+	var win=window.showModalDialog("{{ url_for('map') }}", "", "dialogWidth:1500px;dialogHeight:1000px;dialogLeft:10px;dialogTop:430px;help:no");
+	if(win != null) { 
+		document.getElementById("curloc").value = win; 
+	} 
+}
+</script>
 </head>
 <body>
 	<br>
@@ -153,14 +164,20 @@ $(document).ready(function(){
 	<br>
 	<div>Username: {{ user.username }}</div>
 	<div>Current State: {{ user.state_name }}</div><br>
+	<!-- Form -->
 	<form action="{{ url_for('write_notes') }}" method="post">
+		<!-- Words -->
 		<div class="row">
 			Words:<br>
 			<textarea autofocus name="words" rows="8" cols="30" maxlength="140">{{ form_content.words }}</textarea><br>
 		</div>
+		<!-- Link -->
 		<div class="row">Hyperlink:<input name="link" type="url"></div>
-		<div class="row">Location:<input name="" type="text">
-			Radius:<input name="" type="text"></div>
+		<!-- Location and Radius -->
+		<div class="row">
+			location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >
+			Radius:<input name="radius" type="text" value="{{ form_content.radius }}"></div>
+		<!-- Schedule -->
 		<div class="row">Schedule:
 			<select id="repeat_sel", name="repeat_sel">
 				{% for rep in repeat %}
@@ -180,6 +197,7 @@ $(document).ready(function(){
 				{% endfor %}
 			</select>
 		</div>
+		<!-- Tags -->
 		<div class="row">
       		<label for="jquery-tagbox-select">Select Or Add New Tags:</label>
       		<select name="" id="jquery-tagbox-select-options">

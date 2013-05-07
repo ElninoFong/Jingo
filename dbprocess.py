@@ -1,4 +1,4 @@
-from flask import g, flash
+from flask import g, flash, render_template
 import MySQLdb as mdb
 from datetime import date
 from config import tags
@@ -22,7 +22,7 @@ class dbprocess():
 		schedule_id = g.db.insert_id()
 		flash("Add new schedule: " + str(schedule_id))
 
-		#add tag
+		# add tag
 		tag_id = []
 		for a in addtag:	# remove same tags
 			if a in selecttag:
@@ -47,7 +47,7 @@ class dbprocess():
 					cur.execute(query_add_tag, (a))
 					tag_id.append(g.db.insert_id())
 
-		#add note
+		# add note
 		query_add_note = "INSERT INTO NOTE (uid, words, hyperlink, location_id, radius, schedule_id) \
 				VALUES (%s, %s, %s, %s, %s, %s)"
 		cur.execute(query_add_note, (uid, words, link, loc_id, radius, schedule_id))
@@ -61,6 +61,19 @@ class dbprocess():
 			cur.execute(query_add_tags_in_note, (note_id, t))
 		g.db.commit()
 		# flash("Add tags_in_note.")
+
+	def get_location_id(self, loc=None):
+		# add location to db and get location id
+		results = loc.split(';')
+		if not results or results[0] is u'':
+			loc_id = None
+			return loc_id
+		cur = g.db.cursor()
+		query = "INSERT INTO `Jingo_DB`.`LOCATION` (`location_id`, `latitude`, `longitude`, `location_name`) VALUES (NULL, %s, %s, %s);"
+		cur.execute(query, (results[1],results[2],results[0]))
+		loc_id = g.db.insert_id()
+		flash("Add location " + results[0] + ": " + str(loc_id))
+		return loc_id
 
 # if __name__ == '__main__':
 	# db = mdb.connect('127.0.0.1', 'root', 'root', 

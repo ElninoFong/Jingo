@@ -1,3 +1,3 @@
-from notes import app
+from views import app
 
 app.run(debug=True)

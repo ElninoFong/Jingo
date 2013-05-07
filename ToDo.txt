@@ -1,0 +1,5 @@
+Location Table: lat and long precision.
+Map: show current location marker.
+Write note: get and fill current location when loading page.
+Map: Press enter to search.(bug)
+Map: calculate distance.
