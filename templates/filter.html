@@ -2,9 +2,155 @@
 <html>
 <head>
 	<title>State & Filter</title>
+<!-- Schedule -->
+<link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" media="all" type="text/css" href="/static/jquery-ui-timepicker-addon.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
+<script src="/static/jquery-ui-timepicker-addon.js"></script>
+<script src="/static/jquery-ui-sliderAccess.js"></script>
+<script>
+$(document).ready(function(){
+	var startDateTextBox = $('#startdatetime');
+	var endDateTextBox = $('#enddatetime');
+	var startTimeTextBox = $('#starttime');
+	var endTimeTextBox = $('#endtime');
+	startDateTextBox.datetimepicker({ 
+			onClose: function(dateText, inst) {
+				if (endDateTextBox.val() != '') {
+					var testStartDate = startDateTextBox.datetimepicker('getDate');
+					var testEndDate = endDateTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						endDateTextBox.datetimepicker('setDate', testStartDate);
+				} else { endDateTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate') );
+			}
+	});
+	endDateTextBox.datetimepicker({ 
+			onClose: function(dateText, inst) {
+				if (startDateTextBox.val() != '') {
+					var testStartDate = startDateTextBox.datetimepicker('getDate');
+					var testEndDate = endDateTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						startDateTextBox.datetimepicker('setDate', testEndDate);
+				} else { startDateTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+			}
+	});
+	startDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+	endDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+	startTimeTextBox.timepicker({ 
+			onClose: function(dateText, inst) {
+				if (endTimeTextBox.val() != '') {
+					var testStartDate = startTimeTextBox.datetimepicker('getDate');
+					var testEndDate = endTimeTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						endTimeTextBox.datetimepicker('setDate', testStartDate);
+				} else { endTimeTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				endTimeTextBox.datetimepicker('option', 'minDate', startTimeTextBox.datetimepicker('getDate') );
+			}
+	});
+	endTimeTextBox.timepicker({ 
+			onClose: function(dateText, inst) {
+				if (startTimeTextBox.val() != '') {
+					var testStartDate = startTimeTextBox.datetimepicker('getDate');
+					var testEndDate = endTimeTextBox.datetimepicker('getDate');
+					if (testStartDate > testEndDate)
+						startTimeTextBox.datetimepicker('setDate', testEndDate);
+				} else { startTimeTextBox.val(dateText);}
+			},
+			onSelect: function (selectedDateTime){
+				startTimeTextBox.datetimepicker('option', 'maxDate', endTimeTextBox.datetimepicker('getDate') );
+			}
+	});
+	$('#repeat_sel').change(function(){
+		if($('#repeat_sel').val() == 0) {
+			$('#dow_sel').hide();
+			$('#datetime').show();
+			$('#time').hide();
+		} else if($('#repeat_sel').val() == 2) {
+			$('#dow_sel').show();
+			$('#datetime').hide();
+			$('#time').show();
+		} else {
+			$('#dow_sel').hide();
+			$('#datetime').hide();
+			$('#time').show();
+		}
+	});
+
+	$('#get_sel_val').click(function(){
+		// alert($('#repeat_sel').val());
+		// $(this).hide();
+		alert($('#starttime').val());
+	});
+});
+</script>
+<!-- Tags -->
+<link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+<script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
+<script>
+    var jQuery = jQuery.noConflict();
+    jQuery(function() {
+      jQuery("#jquery-tagbox-text").tagBox();
+      jQuery("#jquery-tagbox-select").tagBox({ 
+      	tagButtonTitle: "SELECT TAG",
+        enableDropdown: true, 
+        dropdownSource: function() {
+          return jQuery("#jquery-tagbox-select-options");
+        }
+      });
+      jQuery('#val_show').click(function(){
+        // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
+        // $('#val_para').text("hello");
+        var res1 = jQuery("#jquery-tagbox-select").val().split(',');
+        var res2 = jQuery("#jquery-tagbox-text").val().split(',');
+        var abc = "";
+        for(var i=0; i<res1.length; i++){
+          abc = abc + res1[i] + "<br>";
+        }
+        for(var i=0; i<res2.length; i++){
+          abc = abc + res2[i] + "<br>";
+        }
+        jQuery('#val_para').html(abc);
+      });
+    });
+</script>
+<style type="text/css">
+  body {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 20px;
+  }
+  div.row {
+    padding: 10px;
+  }
+  
+  div.row label {
+    font-weight: bold;
+    display: block;
+    padding: 0px 0px 10px;
+  }
+</style>
+<!-- Location -->
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+function openwin() {
+	var win=window.showModalDialog("{{ url_for('map') }}", "", "dialogWidth:1500px;dialogHeight:1000px;dialogLeft:10px;dialogTop:430px;help:no");
+	if(win != null) { 
+		document.getElementById("curloc").value = win; 
+	} 
+}
+</script>
 </head>
 <body>
-	<br>
 	{% with messages = get_flashed_messages() %}
 	{% if messages %}
 	<ul>
@@ -14,19 +160,75 @@
 	</ul>
 	{% endif %}
 	{% endwith %}
-	<br>
 	<div>Username: {{ user.username }}</div>
 	<div>Current State: {{ user.state_name }}</div><br>
-	<form action="" method="post">
-		Change State: 
-		<select name="selstate">
-			<option></option>
-			{% for s in state %}
-			<option>{{ s }}</option>
-			{% endfor %}
-		</select><br>
-		OR New State: <input type="text" name="newstate">
-		<input type="submit">
+	<form action="{{ url_for('filter') }}" method="post">
+		<div class="row">
+			Select State: 
+			<select name="state_sel">
+				<option></option>
+				{% for s in state %}
+				<option>{{ s }}</option>
+				{% endfor %}
+			</select>
+			OR New State: <input type="text" name="newstate" style="width:100px;">
+			<!-- Schedule -->
+			&nbsp;&nbsp;|&nbsp;&nbsp;Schedule:
+			<select id="repeat_sel", name="repeat_sel">
+				{% for rep in repeat %}
+				<option value={{ rep.id }}>{{ rep.type }}</option>
+				{% endfor %}
+			</select>
+			<span id="datetime">
+			<input type="text" id="startdatetime" name="startdatetime" value=""> 
+			<input type="text" id="enddatetime" name="enddatetime" value="">
+			</span><span id="time" style="display:none">
+			<input type="text" id="starttime" name="starttime" value=""> 
+			<input type="text" id="endtime" name="endtime" value="">
+			</span>
+			<select id="dow_sel" name='dow_sel' style="display:none">
+				{% for dow in dayofweek %}
+				<option value={{ dow.id }}>{{ dow.day }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="row">
+			<!-- Location and Radius -->
+			Location:<input type="text" id="curloc" name="loc" style="width:150px;" onclick="openwin()" >
+			Radius:<input name="filter_radius" type="text" value="500" style="width:40px;">
+			<!-- Tags -->
+			&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;Select Or Add Tags:
+			<select name="" id="jquery-tagbox-select-options">
+				{% for tag in tags %}
+				<option value={{ tag.name }}>{{ tag.name }}</option>
+				{% endfor %}
+			</select><!--select#-->
+			<input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select">
+			<input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
+		</div><!--div.row-->
+		<br><input type="submit" /><br>
 	</form>
+	<br>
+	{% if results %}
+		<div>
+			<table border="1">
+				<caption>{{ table }}</caption>
+				<tr>
+				{% for field in fields %}
+				<th>{{ field }}</th>
+				{% endfor %}
+				</tr>
+				{% for res in results %}
+				<tr>
+				{% for col in res %}
+				<td>{{ col }}</td>
+				{% endfor %}
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+		<p>No results.</p>
+	{% endif %}
 </body>
 </html>

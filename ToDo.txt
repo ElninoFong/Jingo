@@ -1,5 +1,31 @@
 Location Table: lat and long precision.
-Map: show current location marker.
-Write note: get and fill current location when loading page.
 Map: Press enter to search.(bug)
 Map: calculate distance.
+Map: show all notes on map
+Map: click on map to choose location
+Cookies/Session
+init(): load user state & other info
+delect data button
+
+
+Note: public notes and friends notes only
+Schedule: add weekday and weekend
+Filter: choose time and location
+Comment
+Two interface
+bookmark a note: e.g., as a page displaying a particular piece of content or the results of a search(but not sure this makes sense)
+
+Filter
+Interface
+Paper
+
+Like button
+last timestamp and location
+store location interval
+note access restriction(private, friends only)
+Improving the first project
+
+Focus on db
+
+Alter:
+added 'filter_radius' to FILTER table.

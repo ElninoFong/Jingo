@@ -97,46 +97,46 @@ $(document).ready(function(){
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
 <script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
 <script>
-    var jQuery = jQuery.noConflict();
-    jQuery(function() {
-      jQuery("#jquery-tagbox-text").tagBox();
-      jQuery("#jquery-tagbox-select").tagBox({ 
-      	tagButtonTitle: "SELECT TAG",
-        enableDropdown: true, 
-        dropdownSource: function() {
-          return jQuery("#jquery-tagbox-select-options");
-        }
-      });
-      jQuery('#val_show').click(function(){
-        // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
-        // $('#val_para').text("hello");
-        var res1 = jQuery("#jquery-tagbox-select").val().split(',');
-        var res2 = jQuery("#jquery-tagbox-text").val().split(',');
-        var abc = "";
-        for(var i=0; i<res1.length; i++){
-          abc = abc + res1[i] + "<br>";
-        }
-        for(var i=0; i<res2.length; i++){
-          abc = abc + res2[i] + "<br>";
-        }
-        jQuery('#val_para').html(abc);
-      });
-    });
+	var jQuery = jQuery.noConflict();
+	jQuery(function() {
+	  jQuery("#jquery-tagbox-text").tagBox();
+	  jQuery("#jquery-tagbox-select").tagBox({ 
+		tagButtonTitle: "SELECT TAG",
+		enableDropdown: true, 
+		dropdownSource: function() {
+		  return jQuery("#jquery-tagbox-select-options");
+		}
+	  });
+	  jQuery('#val_show').click(function(){
+		// $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
+		// $('#val_para').text("hello");
+		var res1 = jQuery("#jquery-tagbox-select").val().split(',');
+		var res2 = jQuery("#jquery-tagbox-text").val().split(',');
+		var abc = "";
+		for(var i=0; i<res1.length; i++){
+		  abc = abc + res1[i] + "<br>";
+		}
+		for(var i=0; i<res2.length; i++){
+		  abc = abc + res2[i] + "<br>";
+		}
+		jQuery('#val_para').html(abc);
+	  });
+	});
 </script>
 <style type="text/css">
   body {
-    font-size: 14px;
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 20px;
+	font-size: 14px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 20px;
   }
   div.row {
-    padding: 10px;
+	padding: 10px;
   }
   
   div.row label {
-    font-weight: bold;
-    display: block;
-    padding: 0px 0px 10px;
+	font-weight: bold;
+	display: block;
+	padding: 0px 0px 10px;
   }
 </style>
 <!-- Location -->
@@ -148,10 +148,50 @@ function openwin() {
 		document.getElementById("curloc").value = win; 
 	} 
 }
+
+function init() { 
+	console.log("entering the init() method"); 
+	//首先必须判断浏览器是否有geolocation属性，因为HTML5 才新增了这个属性，不是所有浏览器都支持 
+	if (navigator.geolocation) { 
+		//如果浏览器支持geolocation，则使用geolocation的getCurrentLocation方法来取得用户当前的地理位置， 
+		//并且在成功取得之后调用show_map()回调函数 
+		console.log(' Browser support geolocation '); 
+		navigator.geolocation.getCurrentPosition(show_map,handle_error ,null); 
+	} else { 
+		console.log(' Browser doesnt support geolocation '); 
+	} 
+} 
+
+function handle_error(error){ 
+	var errorTypes={ 
+		1:'位置服务被拒绝', 
+		2:'获取不到位置信息', 
+		3:'获取信息超时' 
+	}; 
+	console.log(errorTypes[error.code] + ":,不能确定你的当前地理位置"); 
+} 
+
+function show_map(position) { 
+	var coords = position.coords; 
+	var curloc=document.getElementById("curloc"); 
+	var geocoder = new google.maps.Geocoder();
+	var latlng = new google.maps.LatLng( coords.latitude, coords.longitude);
+	geocoder.geocode({'location': latlng}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+				if (results[0]) {
+					document.getElementById("curloc").value =results[0].formatted_address+';' + coords.latitude+';'+coords.longitude;
+				} 
+		} else {
+			alert("Geocoder failed due to: " + status);
+		}
+	});
+}
+
+google.maps.event.addDomListener(window, 'load', init );
+
 </script>
 </head>
 <body>
-	<br>
 	{% with messages = get_flashed_messages() %}
 	{% if messages %}
 	<ul>
@@ -161,7 +201,6 @@ function openwin() {
 	</ul>
 	{% endif %}
 	{% endwith %}
-	<br>
 	<div>Username: {{ user.username }}</div>
 	<div>Current State: {{ user.state_name }}</div><br>
 	<!-- Form -->
@@ -175,7 +214,7 @@ function openwin() {
 		<div class="row">Hyperlink:<input name="link" type="url"></div>
 		<!-- Location and Radius -->
 		<div class="row">
-			location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >
+			Location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >
 			Radius:<input name="radius" type="text" value="{{ form_content.radius }}"></div>
 		<!-- Schedule -->
 		<div class="row">Schedule:
@@ -199,20 +238,16 @@ function openwin() {
 		</div>
 		<!-- Tags -->
 		<div class="row">
-      		<label for="jquery-tagbox-select">Select Or Add New Tags:</label>
-      		<select name="" id="jquery-tagbox-select-options">
-      			{% for tag in tags %}
+			<label for="jquery-tagbox-select">Select Or Add New Tags:</label>
+			<select name="" id="jquery-tagbox-select-options">
+				{% for tag in tags %}
 				<option value={{ tag.name }}>{{ tag.name }}</option>
 				{% endfor %}
-      		</select><!--select#-->
-      		<input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select"><br><br>
-     		<input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
+			</select><!--select#-->
+			<input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select"><br><br>
+			<input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
 		</div><!--div.row-->
-  		<div><input id="val_show" type="button" value="test button"><br>
-    	<p id="val_para"></p></div>
-
 		<br><input type="submit" /><br>
-		<input id ="get_sel_val" type="button" value="test button2">
 	</form>
 </body>
 </html>

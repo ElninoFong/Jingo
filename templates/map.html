@@ -43,8 +43,18 @@ initialize(latlng);
 geocoder.geocode({'location': latlng}, function(results, status) {
   if (status == google.maps.GeocoderStatus.OK) {
   if (results[0]) {
+    var marker = new google.maps.Marker({
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+    position: latlng
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(results[0].formatted_address);
+      infowindow.open(map, this);
+    });
+}
 	  document.getElementById("curloc").value =results[0].formatted_address+';' + coords.latitude+';'+coords.longitude;
-  } 
 } else {
 	alert("Geocoder failed due to: " + status);
 }
@@ -110,8 +120,6 @@ function createMarker(place) {
 
 google.maps.event.addDomListener(window, 'load', init );
 
-
-
 function onloadCity(value) {
 //	alert(value);
 	cityToLatLng(value);
@@ -130,7 +138,6 @@ function cityToLatLng(city){
 	return geocoder.geocode({address:city}, geoResults);
 }
 
-
 function geoResults(results, status){
 
 	  if (status == google.maps.GeocoderStatus.OK) {
@@ -141,44 +148,33 @@ function geoResults(results, status){
 	  }
   }
   
-  
-  
 function reciveloc(loc){
-	
 	 window.returnValue = loc ;
-     window.close(); 
-
+   window.close(); 
 }
-
-
-
-    </script>
+  </script>
   </head>
   <body>
     <div id="map-canvas" style="width: 50%; float:left"></div>
     <div style="width:46%; float:left">
       <pre>
 <form id="loadconfigform">
-search: <input type="text" id="configname" name="configname" /><input type="button" value="Submit"
+&nbsp;&nbsp;search: <input type="text" id="configname" name="configname" /><input type="button" value="Submit"
 		     onclick="onloadCity(document.getElementById('configname').value);" />
 </form>
-		  
-current loction :
-<input type="text" id="curloc" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('curloc').value);">
-nearby:
-<input type="text" id="0" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('0').value);">
-<input type="text" id="1" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('1').value);">
-<input type="text" id="2" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('2').value);">
-<input type="text" id="3" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('3').value);">
-<input type="text" id="4" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('4').value);">
-<input type="text" id="5" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('5').value);">
-<input type="text" id="6" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('6').value);">
-<input type="text" id="7" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('7').value);">
-<input type="text" id="8" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('8').value);">
-<input type="text" id="9" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('9').value);">
-
-
-
+&nbsp;&nbsp;current loction:
+&nbsp;&nbsp;<input type="text" id="curloc" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('curloc').value);">
+&nbsp;&nbsp;nearby:
+&nbsp;&nbsp;<input type="text" id="0" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('0').value);">
+&nbsp;&nbsp;<input type="text" id="1" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('1').value);">
+&nbsp;&nbsp;<input type="text" id="2" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('2').value);">
+&nbsp;&nbsp;<input type="text" id="3" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('3').value);">
+&nbsp;&nbsp;<input type="text" id="4" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('4').value);">
+&nbsp;&nbsp;<input type="text" id="5" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('5').value);">
+&nbsp;&nbsp;<input type="text" id="6" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('6').value);">
+&nbsp;&nbsp;<input type="text" id="7" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('7').value);">
+&nbsp;&nbsp;<input type="text" id="8" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('8').value);">
+&nbsp;&nbsp;<input type="text" id="9" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('9').value);">
       </pre>
   </body>
 </html>
