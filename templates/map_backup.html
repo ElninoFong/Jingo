@@ -10,6 +10,7 @@
 var map;
 var infowindow;
 
+
 function init() { 
 console.log("entering the init() method"); 
 if (navigator.geolocation) { 
@@ -18,6 +19,7 @@ navigator.geolocation.getCurrentPosition(show_map,handle_error ,null);
 } else { 
 console.log(' Browser doesnt support geolocation '); 
 } 
+ 
 } 
 
 function handle_error(error){ 
@@ -41,18 +43,18 @@ initialize(latlng);
 geocoder.geocode({'location': latlng}, function(results, status) {
   if (status == google.maps.GeocoderStatus.OK) {
   if (results[0]) {
-	  var marker = new google.maps.Marker({
-	    map: map,
-		icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-	    position: latlng
-	  });
-	  google.maps.event.addListener(marker, 'click', function() {
-	      infowindow.setContent(results[0].formatted_address);
-	      infowindow.open(map, this);
-	    });
-	  
+    var marker = new google.maps.Marker({
+    map: map,
+    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+    position: latlng
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(results[0].formatted_address);
+      infowindow.open(map, this);
+    });
+}
 	  document.getElementById("curloc").value =results[0].formatted_address+';' + coords.latitude+';'+coords.longitude;
-  } 
 } else {
 	alert("Geocoder failed due to: " + status);
 }
@@ -71,7 +73,6 @@ function initialize(pyrmont) {
     center: pyrmont,
     zoom: 15
   });
-  
 
   var request = {
     location: pyrmont,
@@ -90,7 +91,7 @@ function callback(results, status) {
 	  
     }
 
- document.getElementById("0").value=results[0].name+';'+results[0].geometry.location.lat()+';'+results[0].geometry.location.lng()
+   document.getElementById("0").value=results[0].name+';'+results[0].geometry.location.lat()+';'+results[0].geometry.location.lng()
 	 document.getElementById("1").value=results[1].name+';'+results[1].geometry.location.lat()+';'+results[1].geometry.location.lng()
 	 document.getElementById("2").value=results[2].name+';'+results[2].geometry.location.lat()+';'+results[2].geometry.location.lng()
 	 document.getElementById("3").value=results[3].name+';'+results[3].geometry.location.lat()+';'+results[3].geometry.location.lng()
@@ -99,7 +100,6 @@ function callback(results, status) {
 	 document.getElementById("6").value=results[6].name+';'+results[6].geometry.location.lat()+';'+results[6].geometry.location.lng()
 	 document.getElementById("7").value=results[7].name+';'+results[7].geometry.location.lat()+';'+results[7].geometry.location.lng()
 	 document.getElementById("8").value=results[8].name+';'+results[8].geometry.location.lat()+';'+results[8].geometry.location.lng()
-
 	 document.getElementById("9").value=results[9].name+';'+results[7].geometry.location.lat()+';'+results[9].geometry.location.lng()
 	
   }
@@ -120,8 +120,6 @@ function createMarker(place) {
 
 google.maps.event.addDomListener(window, 'load', init );
 
-
-
 function onloadCity(value) {
 //	alert(value);
 	cityToLatLng(value);
@@ -140,63 +138,32 @@ function cityToLatLng(city){
 	return geocoder.geocode({address:city}, geoResults);
 }
 
-
 function geoResults(results, status){
 
 	  if (status == google.maps.GeocoderStatus.OK) {
 	 		initialize(results[0].geometry.location);
-	  	  var marker = new google.maps.Marker({
-	  	    map: map,
-			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-	  	    position: results[0].geometry.location
-	  	  });
-		  google.maps.event.addListener(marker, 'click', function() {
-		      infowindow.setContent(results[0].formatted_address);
-		      infowindow.open(map, this);
-		    });
-		document.getElementById("curloc").value =results[0].formatted_address+';' +results[0].geometry.location.lat()+';'+results[0].geometry.location.lng();
-			
-			
 		
 	  }else{
 	    alert("you have to input !");
 	  }
   }
   
-  
-  
 function reciveloc(loc){
-	
 	 window.returnValue = loc ;
-     window.close(); 
-
+   window.close(); 
 }
-
-function BindEnter(obj)
-{
-    //使用document.getElementById获取到按钮对象
-    var button = document.getElementById('submit');
-    if(obj.keyCode == 13)
-        {
-            button.click();
-            obj.returnValue = false;
-        }
-} 
-
-
-
-    </script>
+  </script>
   </head>
-  <body onkeydown="BindEnter(event)">
+  <body>
     <div id="map-canvas" style="width: 50%; float:left"></div>
     <div style="width:46%; float:left">
       <pre>
 <form id="loadconfigform">
-search: <input  type="text" id="configname" name="configname" /><input type="button" id="submit" value="Submit"
+&nbsp;&nbsp;search: <input type="text" id="configname" name="configname" /><input type="button" value="Submit"
 		     onclick="onloadCity(document.getElementById('configname').value);" />
 </form>
-&nbsp;&nbsp;current loction :
-&nbsp;&nbsp;<input type="text" id="curloc" name="location"  style="width:500px;" ><input type=submit  id= "b0" value="go" onclick = "reciveloc(document.getElementById('curloc').value);">
+&nbsp;&nbsp;current loction:
+&nbsp;&nbsp;<input type="text" id="curloc" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('curloc').value);">
 &nbsp;&nbsp;nearby:
 &nbsp;&nbsp;<input type="text" id="0" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('0').value);">
 &nbsp;&nbsp;<input type="text" id="1" name="location"  style="width:500px;" ><input type=submit value="go" onclick = "reciveloc(document.getElementById('1').value);">

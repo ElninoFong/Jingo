@@ -158,7 +158,7 @@ def filter():
 			# add a new filter
 			process.add_filter(state_id=state_id, schedule_id=schedule_id, loc_id=loc_id, filter_radius=request.form['filter_radius'],
 								selecttag=selecttag, addtag=addtag)
-	fields = ['uid', 'username', 'state_id', 'state_name', 'filter_id', 'filter_radius', 'schedule_id', 'starttime', 'endtime', 'dow_name', 'location_id', 'location_name' 'tag_name']
+	fields = ['uid', 'username', 'state_id', 'state_name', 'filter_id', 'filter_radius', 'schedule_id', 'starttime', 'endtime', 'dow_name', 'location_id', 'location_name', 'tag_name']
 	query_filter = "SELECT uid, username, state_id, state_name, filter_id, filter_radius, schedule_id, starttime, endtime, dow_name, location_id, location_name, tag_name \
 		FROM USER NATURAL JOIN STATE NATURAL JOIN FILTER NATURAL JOIN SCHEDULE NATURAL LEFT JOIN LOCATION NATURAL JOIN DAYOFWEEK NATURAL LEFT JOIN TAGS_IN_FILTER NATURAL LEFT JOIN TAG \
 		WHERE dayofweek = dow_id AND uid = %s"
@@ -177,6 +177,9 @@ def filter():
 def map():
 	return render_template('map.html')
 
-@app.route('/test')
+@app.route('/test', methods=['GET', 'POST'])
 def test():
-	return render_template('test.html')
+	distance = None
+	if request.method == 'POST':
+		distance = process.cal_distance(39, 40)
+	return render_template('test.html', distance=distance)

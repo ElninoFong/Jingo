@@ -67,5 +67,9 @@
   </form>
   <div><input id="val_show" type="button" value="test button"><br>
     <p id="val_para"></p></div>
+    <form action="{{ url_for('test') }}" method="post">
+        <input type="submit" value="DistantTest">
+        <div><p name="dist"></p>{{ distance }}</div>
+    </form>
 </body>
 </html>

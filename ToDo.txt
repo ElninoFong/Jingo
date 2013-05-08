@@ -1,5 +1,4 @@
 Location Table: lat and long precision.
-Map: Press enter to search.(bug)
 Map: calculate distance.
 Map: show all notes on map
 Map: click on map to choose location
@@ -29,3 +28,4 @@ Focus on db
 
 Alter:
 added 'filter_radius' to FILTER table.
+altered 'location_name' varchar(20) to varchar(200).
