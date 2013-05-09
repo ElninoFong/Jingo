@@ -1,5 +1,3 @@
-Location Table: lat and long precision.
-Map: calculate distance.
 Map: show all notes on map
 Map: click on map to choose location
 Cookies/Session
@@ -27,5 +25,5 @@ Improving the first project
 Focus on db
 
 Alter:
-added 'filter_radius' to FILTER table.
 altered 'location_name' varchar(20) to varchar(200).
+altered 'latitude, longitude' to float(10, 6)

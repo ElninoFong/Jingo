@@ -150,7 +150,7 @@ class dbprocess():
 		if results:
 			lat2 = float(results[0])
 			long2 = float(results[1])
-			
+
 		# Convert latitude and longitude to 
 		# spherical coordinates in radians.
 		degrees_to_radians = math.pi/180.0
@@ -180,7 +180,7 @@ class dbprocess():
 		# To get the distance in miles, multiply by 3960. To get the distance in kilometers, multiply by 6373.
 		return arc * 6373 * 1000	# use meters
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 	# db = mdb.connect('127.0.0.1', 'root', 'root', 
 	# 	'Jingo_DB', port=8889);
 	# cur = db.cursor()
@@ -191,5 +191,3 @@ if __name__ == '__main__':
 	# else:
 	# 	result = None
 	# print result
-	process = dbprocess()
-	# print process.cal_distance(40.694074, -73.98693, 40.694461, -73.98576)

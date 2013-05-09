@@ -89,9 +89,9 @@ def recieve_notes():
 	query_rec = "CALL recnotesproc (%s, %s, %s)"
 	cur.execute(query_field)
 	fields = [row[0] for row in cur.fetchall()]
-	cur.execute(query_rec, (user['uid'], user['state_id'], user['last_loc_name']))
+	cur.execute(query_rec, (user['state_id'], user['last_loc_name'], str(datetime.now().replace(second=0, microsecond=0))))
 	results = cur.fetchall()
-	flash(user['username'] + " in " + user['last_loc_name'] + " at " + str(datetime.now()) + " recieve following notes.")
+	flash(user['username'] + " in " + user['last_loc_name'] + " at " + str(datetime.now().replace(microsecond=0)) + " recieve following notes.")
 	return render_template('show_notes.html',
 		title = 'Show Recieve Notes',
 		table = 'NOTES',
@@ -156,10 +156,9 @@ def filter():
 			selecttag = request.form['jquery-tagbox-select'].split(',')
 			addtag = request.form['jquery-tagbox-text'].split(',')
 			# add a new filter
-			process.add_filter(state_id=state_id, schedule_id=schedule_id, loc_id=loc_id, filter_radius=request.form['filter_radius'],
-								selecttag=selecttag, addtag=addtag)
-	fields = ['uid', 'username', 'state_id', 'state_name', 'filter_id', 'filter_radius', 'schedule_id', 'starttime', 'endtime', 'dow_name', 'location_id', 'location_name', 'tag_name']
-	query_filter = "SELECT uid, username, state_id, state_name, filter_id, filter_radius, schedule_id, starttime, endtime, dow_name, location_id, location_name, tag_name \
+			process.add_filter(state_id=state_id, schedule_id=schedule_id, loc_id=loc_id, selecttag=selecttag, addtag=addtag)
+	fields = ['uid', 'username', 'state_id', 'state_name', 'filter_id', 'schedule_id', 'starttime', 'endtime', 'dow_name', 'location_id', 'location_name', 'tag_name']
+	query_filter = "SELECT uid, username, state_id, state_name, filter_id, schedule_id, starttime, endtime, dow_name, location_id, location_name, tag_name \
 		FROM USER NATURAL JOIN STATE NATURAL JOIN FILTER NATURAL JOIN SCHEDULE NATURAL LEFT JOIN LOCATION NATURAL JOIN DAYOFWEEK NATURAL LEFT JOIN TAGS_IN_FILTER NATURAL LEFT JOIN TAG \
 		WHERE dayofweek = dow_id AND uid = %s"
 	cur.execute(query_filter, (user['uid'],))
