@@ -3,6 +3,7 @@ import MySQLdb as mdb
 from datetime import datetime
 from dbprocess import dbprocess
 from config import state, dayofweek, repeat, tags
+import re
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -12,8 +13,9 @@ user = {'uid': 1,
 		'username': 'James',
 		'email': 'James@gmail.com',
 		'profile_id': 6,
-		'last_loc_name': 'soho',
-		'state_id': 2,
+		'last_loc_id': 1,
+		'last_loc_name': 'Polytechnic Institute of New York University',
+		'state_id': 19,
 		'state_name': 'at work'}
 
 def connect_db():
@@ -38,6 +40,8 @@ def show_all_notes():
 	cur.execute(query_data)
 	results = cur.fetchall()
 	return render_template('show_notes.html',
+		user = user,
+		state = state,
 		title = 'Show All Notes',
 		table = 'NOTES',
 		fields = fields,
@@ -82,17 +86,34 @@ def write_notes():
 		tags = tags,
 		form_content = form_content)
 
-@app.route('/recieve_notes')
+@app.route('/recieve_notes', methods = ['GET', 'POST'])
 def recieve_notes():
 	cur = g.db.cursor()
 	query_field = "SHOW FIELDS FROM NOTE"
 	query_rec = "CALL recnotesproc (%s, %s, %s)"
 	cur.execute(query_field)
 	fields = [row[0] for row in cur.fetchall()]
-	cur.execute(query_rec, (user['state_id'], user['last_loc_name'], str(datetime.now().replace(second=0, microsecond=0))))
+	curlocid = user['last_loc_id']
+	curlocname = user['last_loc_name']
+	curdatetime = str(datetime.now().replace(second=0, microsecond=0))
+	if request.method == 'POST':
+		if request.form['curdatetime']:
+			curlocid = process.get_location_id(request.form['curloc'])
+			g.db.commit()
+			curlocname = re.split('; |, ', request.form['curloc'])[0]
+			curdatetime = str(request.form['curdatetime'])
+		else:
+			curlocid = process.get_location_id(request.form['curloc'])
+			g.db.commit()
+			curlocname = re.split('; |, ', request.form['curloc'])[0]
+	cur.execute(query_rec, (user['state_id'], curlocid, curdatetime))
 	results = cur.fetchall()
-	flash(user['username'] + " in " + user['last_loc_name'] + " at " + str(datetime.now().replace(microsecond=0)) + " recieve following notes.")
+	flash(user['state_id'])
+	flash(user['state_name'])
+	flash(user['username'] + " in '" + str(curlocname) + "' at '" + str(datetime.now().replace(microsecond=0)) + "' recieve following notes.")
 	return render_template('show_notes.html',
+		user = user,
+		state = state,
 		title = 'Show Recieve Notes',
 		table = 'NOTES',
 		fields = fields,
@@ -109,6 +130,8 @@ def my_notes():
 	results = cur.fetchall()
 	flash(user['username'] + " published following notes.")
 	return render_template('show_notes.html',
+		user = user,
+		state = state,
 		title = 'Show My Notes',
 		table = 'NOTES',
 		fields = fields,
@@ -130,6 +153,7 @@ def filter():
 				state_id = results[0]
 			else:
 				state_id = process.add_state(user['uid'], request.form['state_sel'])	# add state to db
+			user['state_id'] = state_id
 			user['state_name'] = request.form['state_sel']
 		elif request.form['newstate']:
 			cur.execute("SELECT state_id FROM STATE WHERE uid = %s AND state_name = %s", (user['uid'], request.form['newstate']))
@@ -138,6 +162,8 @@ def filter():
 				state_id = results[0]
 			else:
 				state_id = process.add_state(user['uid'], request.form['newstate'])	# add state to db
+				state.append(request.form['newstate'])
+			user['state_id'] = state_id
 			user['state_name'] = request.form['newstate']
 
 		if not ((request.form['startdatetime'] and request.form['enddatetime']) or (request.form['starttime'] and request.form['endtime'])):

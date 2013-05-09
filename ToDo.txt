@@ -3,6 +3,7 @@ Map: click on map to choose location
 Cookies/Session
 init(): load user state & other info
 delect data button
+check duplicative location before insert
 
 
 Note: public notes and friends notes only

@@ -181,6 +181,7 @@ class dbprocess():
 		return arc * 6373 * 1000	# use meters
 
 # if __name__ == '__main__':
+	# print datetime.now().replace(microsecond=0)
 	# db = mdb.connect('127.0.0.1', 'root', 'root', 
 	# 	'Jingo_DB', port=8889);
 	# cur = db.cursor()
