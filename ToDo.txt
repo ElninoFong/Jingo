@@ -2,13 +2,13 @@ Map: show all notes on map
 Map: click on map to choose location
 Cookies/Session
 init(): load user state & other info
-delect data button
+delete data button
 check duplicative location before insert
 
 
 Note: public notes and friends notes only
 Schedule: add weekday and weekend
-Filter: choose time and location
+Filter: add location filter
 Comment
 Two interface
 bookmark a note: e.g., as a page displaying a particular piece of content or the results of a search(but not sure this makes sense)
@@ -28,3 +28,4 @@ Focus on db
 Alter:
 altered 'location_name' varchar(20) to varchar(200).
 altered 'latitude, longitude' to float(10, 6)
+merged profile into user

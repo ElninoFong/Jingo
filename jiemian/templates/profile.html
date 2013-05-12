@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+<h3>this is your profile</h3> 
+
+	
+	{% if results %}
+		<div>
+			<table border="1">
+			<tr>
+			<td>first name</td>
+			<td>{{ results[0][0] }}</td>
+			</tr>
+			<tr>
+			<td>last name</td>
+			<td>{{ results[0][1] }}</td>
+			</tr>
+			<tr>
+			<td>gender</td>
+			<td>{{ results[0][2] }}</td>
+			</tr>
+			<td>email</td>
+			<td>{{ results[0][3] }}</td>
+			</tr>
+			</table><br>
+		</div>
+		<form action="{{ url_for('profile') }}" method="post">
+<h3>edit your profile</h3>
+		  <dl>
+			<dt>Last name:<input type="text" name="lname">
+			<dt>first name:<input type="text" name="fname">
+			<dt>email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="email">
+			<dt>gender:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="gender" value = "male">male<br>
+			<dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="gender" value = "female">female<br>
+		    			<dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="submit" value="edit" >
+		
+		  </dl>
+		</form>
+	{% else %}
+		<p>No results.</p>
+	{% endif %}
+{% endblock %}

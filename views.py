@@ -108,8 +108,6 @@ def recieve_notes():
 			curlocname = re.split('; |, ', request.form['curloc'])[0]
 	cur.execute(query_rec, (user['state_id'], curlocid, curdatetime))
 	results = cur.fetchall()
-	flash(user['state_id'])
-	flash(user['state_name'])
 	flash(user['username'] + " in '" + str(curlocname) + "' at '" + str(datetime.now().replace(microsecond=0)) + "' recieve following notes.")
 	return render_template('show_notes.html',
 		user = user,
