@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+{% block title %}
+  {% if request.endpoint == 'public_timeline' %}
+    Public Timeline
+  {% elif request.endpoint == 'user_timeline' %}
+    {{ profile_username }}'s Timeline
+  {% else %}
+    My Timeline
+  {% endif %}
+{% endblock %}
+{% block head %}
+<!-- Schedule -->
+<link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" media="all" type="text/css" href="/static/jquery-ui-timepicker-addon.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
+<script src="/static/jquery-ui-timepicker-addon.js"></script>
+<script src="/static/jquery-ui-sliderAccess.js"></script>
+<script>
+$(document).ready(function(){
+  var startDateTextBox = $('#startdatetime');
+  var endDateTextBox = $('#enddatetime');
+  var startTimeTextBox = $('#starttime');
+  var endTimeTextBox = $('#endtime');
+  startDateTextBox.datetimepicker({ 
+      onClose: function(dateText, inst) {
+        if (endDateTextBox.val() != '') {
+          var testStartDate = startDateTextBox.datetimepicker('getDate');
+          var testEndDate = endDateTextBox.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            endDateTextBox.datetimepicker('setDate', testStartDate);
+        } else { endDateTextBox.val(dateText);}
+      },
+      onSelect: function (selectedDateTime){
+        endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate') );
+      }
+  });
+  endDateTextBox.datetimepicker({ 
+      onClose: function(dateText, inst) {
+        if (startDateTextBox.val() != '') {
+          var testStartDate = startDateTextBox.datetimepicker('getDate');
+          var testEndDate = endDateTextBox.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            startDateTextBox.datetimepicker('setDate', testEndDate);
+        } else { startDateTextBox.val(dateText);}
+      },
+      onSelect: function (selectedDateTime){
+        startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+      }
+  });
+  startDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+  endDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+  startTimeTextBox.timepicker({ 
+      onClose: function(dateText, inst) {
+        if (endTimeTextBox.val() != '') {
+          var testStartDate = startTimeTextBox.datetimepicker('getDate');
+          var testEndDate = endTimeTextBox.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            endTimeTextBox.datetimepicker('setDate', testStartDate);
+        } else { endTimeTextBox.val(dateText);}
+      },
+      onSelect: function (selectedDateTime){
+        endTimeTextBox.datetimepicker('option', 'minDate', startTimeTextBox.datetimepicker('getDate') );
+      }
+  });
+  endTimeTextBox.timepicker({ 
+      onClose: function(dateText, inst) {
+        if (startTimeTextBox.val() != '') {
+          var testStartDate = startTimeTextBox.datetimepicker('getDate');
+          var testEndDate = endTimeTextBox.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            startTimeTextBox.datetimepicker('setDate', testEndDate);
+        } else { startTimeTextBox.val(dateText);}
+      },
+      onSelect: function (selectedDateTime){
+        startTimeTextBox.datetimepicker('option', 'maxDate', endTimeTextBox.datetimepicker('getDate') );
+      }
+  });
+  $('#repeat_sel').change(function(){
+    if($('#repeat_sel').val() == 0) {
+      $('#dow_sel').hide();
+      $('#datetime').show();
+      $('#time').hide();
+    } else if($('#repeat_sel').val() == 2) {
+      $('#dow_sel').show();
+      $('#datetime').hide();
+      $('#time').show();
+    } else {
+      $('#dow_sel').hide();
+      $('#datetime').hide();
+      $('#time').show();
+    }
+  });
+
+  $('#get_sel_val').click(function(){
+    // alert($('#repeat_sel').val());
+    // $(this).hide();
+    alert($('#starttime').val());
+  });
+});
+</script>
+<!-- Tags -->
+<link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+<script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
+<script>
+  var jQuery = jQuery.noConflict();
+  jQuery(function() {
+    jQuery("#jquery-tagbox-text").tagBox();
+    jQuery("#jquery-tagbox-select").tagBox({ 
+    tagButtonTitle: "SELECT TAG",
+    enableDropdown: true, 
+    dropdownSource: function() {
+      return jQuery("#jquery-tagbox-select-options");
+    }
+    });
+    jQuery('#val_show').click(function(){
+    // $('#val_para').text(jQuery("#jquery-tagbox-select").val().split(','));
+    // $('#val_para').text("hello");
+    var res1 = jQuery("#jquery-tagbox-select").val().split(',');
+    var res2 = jQuery("#jquery-tagbox-text").val().split(',');
+    var abc = "";
+    for(var i=0; i<res1.length; i++){
+      abc = abc + res1[i] + "<br>";
+    }
+    for(var i=0; i<res2.length; i++){
+      abc = abc + res2[i] + "<br>";
+    }
+    jQuery('#val_para').html(abc);
+    });
+  });
+</script>
+<style type="text/css">
+  body {
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 20px;
+  }
+  div.row {
+  padding: 10px;
+  }
+  
+  div.row label {
+  font-weight: bold;
+  display: block;
+  padding: 0px 0px 10px;
+  }
+</style>
+<!-- Location -->
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+function openwin() {
+  var win=window.showModalDialog("{{ url_for('map') }}", "", "dialogWidth:1500px;dialogHeight:1000px;dialogLeft:10px;dialogTop:430px;help:no");
+  if(win != null) { 
+    document.getElementById("curloc").value = win; 
+  } 
+}
+
+function init() { 
+  console.log("entering the init() method"); 
+  //首先必须判断浏览器是否有geolocation属性，因为HTML5 才新增了这个属性，不是所有浏览器都支持 
+  if (navigator.geolocation) { 
+    //如果浏览器支持geolocation，则使用geolocation的getCurrentLocation方法来取得用户当前的地理位置， 
+    //并且在成功取得之后调用show_map()回调函数 
+    console.log(' Browser support geolocation '); 
+    navigator.geolocation.getCurrentPosition(show_map,handle_error ,null); 
+  } else { 
+    console.log(' Browser doesnt support geolocation '); 
+  } 
+} 
+
+function handle_error(error){ 
+  var errorTypes={ 
+    1:'位置服务被拒绝', 
+    2:'获取不到位置信息', 
+    3:'获取信息超时' 
+  }; 
+  console.log(errorTypes[error.code] + ":,不能确定你的当前地理位置"); 
+} 
+
+function show_map(position) { 
+  var coords = position.coords; 
+  var curloc=document.getElementById("curloc"); 
+  var geocoder = new google.maps.Geocoder();
+  var latlng = new google.maps.LatLng( coords.latitude, coords.longitude);
+  geocoder.geocode({'location': latlng}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          document.getElementById("curloc").value =results[0].formatted_address+';' + coords.latitude+';'+coords.longitude;
+        } 
+    } else {
+      alert("Geocoder failed due to: " + status);
+    }
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', init );
+
+</script>
+{% endblock %}
+{% block body %}
+  <h2>{{ self.title() }}</h2>
+  {% if g.user %}
+    {% if request.endpoint == 'user_timeline' %}
+      <div class=followstatus>
+      {% if g.user == profile_user %}
+        This is you!
+      {% elif followed %}
+        You are currently following this user.
+        <a class=unfollow href="">Unfollow user</a>.
+      {% else %}
+        You are not yet following this user.
+        <a class=follow href="">Follow user</a>.
+      {% endif %}
+      </div>
+    {% elif request.endpoint == 'timeline' or request.endpoint == 'write_notes' %}
+      <div class=twitbox>
+        <h3>What's on your mind {{ session.username }}?</h3>
+        <form action="{{ url_for('write_notes') }}" method=post>
+          <!-- Words -->
+          <p><input type=text name=words size=60 value={{ form_content.words }}><!--
+          --><input type=submit value="Share">
+          <!-- Link -->
+          <div>Hyperlink:<input name="link" type="text" style="width:200px;"></div>
+          <!-- Location and Radius -->
+          <div>
+            Location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >
+            Radius:<input name="radius" type="text" value="500"></div>
+          <!-- Schedule -->
+          <div>Schedule:
+            <select id="repeat_sel", name="repeat_sel">
+              {% for rep in repeat %}
+              <option value={{ rep.id }}>{{ rep.type }}</option>
+              {% endfor %}
+            </select>
+            <span id="datetime">
+            <input type="text" id="startdatetime" name="startdatetime" value=""> 
+            <input type="text" id="enddatetime" name="enddatetime" value="">
+            </span><span id="time" style="display:none">
+            <input type="text" id="starttime" name="starttime" value=""> 
+            <input type="text" id="endtime" name="endtime" value="">
+            </span>
+            <select id="dow_sel" name='dow_sel' style="display:none">
+              {% for dow in dayofweek %}
+              <option value={{ dow.id }}>{{ dow.day }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <!-- Tags -->
+          <div>
+            <label for="jquery-tagbox-select">Select Or Add New Tags:</label>
+            <select name="" id="jquery-tagbox-select-options">
+              {% for tag in tags %}
+              <option value={{ tag.name }}>{{ tag.name }}</option>
+              {% endfor %}
+            </select><!--select#-->
+            <input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select"><br><br>
+            <input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  {% endif %}
+  <ul class=messages>
+  {% for message in messages %}
+    <li><img src="{{ message.email|gravatar(size=48) }}"><p>
+      <strong><a href="{{ url_for('user_timeline', username=message.username)
+      }}">{{ message.username }}</a></strong>
+      {{ message.words }}
+      <small>&mdash; {{ message.created_at }}</small>
+  {% else %}
+    <li><em>There's no notes so far.</em>
+  {% endfor %}
+  </ul>
+{% endblock %}

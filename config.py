@@ -1,4 +1,5 @@
 SECRET_KEY = 'development key'
+PER_PAGE = 30
 
 state = ['at work',
 		 'lunch break',

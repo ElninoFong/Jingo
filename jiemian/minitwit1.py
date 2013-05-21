@@ -115,14 +115,14 @@ def login():
 	  #flash(query)
 		cur.execute(query)
 		results = [row[0] for row in cur.fetchall()]
-	if request.form['username'] not in results:
-		error = 'Invalid username'
-	elif request.form['password'] not in findpassword(request.form['username']):
-		error = 'Invalid password'
-	else:
-		session['username'] = request.form['username']
-		flash('You were logged in')
-		return redirect(url_for('timeline'))
+		if request.form['username'] not in results:
+			error = 'Invalid username'
+		elif request.form['password'] not in findpassword(request.form['username']):
+			error = 'Invalid password'
+		else:
+			session['username'] = request.form['username']
+			flash('You were logged in')
+			return redirect(url_for('timeline'))
 	return render_template('login.html', error=error)
    
 

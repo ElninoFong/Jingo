@@ -12,6 +12,7 @@ Filter: add location filter
 Comment
 Two interface
 bookmark a note: e.g., as a page displaying a particular piece of content or the results of a search(but not sure this makes sense)
+user avatar
 
 Filter
 Interface
@@ -29,3 +30,4 @@ Alter:
 altered 'location_name' varchar(20) to varchar(200).
 altered 'latitude, longitude' to float(10, 6)
 merged profile into user
+altered 'password' varchar(20) to varchar(60)
