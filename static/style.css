@@ -149,9 +149,9 @@ div.page div.twitbox p {
     margin: 0;
 }
 
-div.page div.twitbox input[type="text"] {
+/*div.page div.twitbox input[type="text"] {
     width: 585px;
-}
+}*/
 
 div.page div.twitbox input[type="submit"] {
     width: 70px;

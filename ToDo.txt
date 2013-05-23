@@ -31,3 +31,4 @@ altered 'location_name' varchar(20) to varchar(200).
 altered 'latitude, longitude' to float(10, 6)
 merged profile into user
 altered 'password' varchar(20) to varchar(60)
+add 'last_state_id' in USER

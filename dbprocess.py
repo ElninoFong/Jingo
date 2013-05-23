@@ -5,6 +5,20 @@ from config import tags
 import math
 
 class dbprocess():
+	def update_loc(self, uid, loc_id):
+		cur = g.db.cursor()
+		query_update_loc = "UPDATE USER SET last_location_id = %s WHERE uid = %s"
+		cur.execute(query_update_loc, (loc_id, uid))
+		g.db.commit()
+
+
+	def update_state(self, uid, state_id):
+		cur = g.db.cursor()
+		query_update_state = "UPDATE USER SET last_state_id = %s WHERE uid = %s"
+		cur.execute(query_update_state, (state_id, uid))
+		g.db.commit()
+
+
 	def insert_note(self, uid=None, words='', link=None, loc_id=None,
 					radius=None, schedule_id=None, selecttag=[], addtag=[]):
 		cur = g.db.cursor()
@@ -96,7 +110,7 @@ class dbprocess():
 		for t in tag_id:
 			cur.execute(query_add_tags_in_filter, (filter_id, t))
 		g.db.commit()
-		flash("Succeeded to add tags_in_filter.")
+		# flash("Succeeded to add tags_in_filter.")
 
 
 	def get_location_id(self, loc=None):
@@ -109,7 +123,7 @@ class dbprocess():
 		query = "INSERT INTO `Jingo_DB`.`LOCATION` (`location_id`, `latitude`, `longitude`, `location_name`) VALUES (NULL, %s, %s, %s);"
 		cur.execute(query, (results[1],results[2],results[0]))
 		loc_id = g.db.insert_id()
-		flash("Add location: " + results[0] + ": " + str(loc_id))
+		# flash("Add location: " + results[0] + ": " + str(loc_id))
 		return loc_id
 
 	def get_schedule_id(self, repeat='0', startdatetime=None, enddatetime=None, 
@@ -125,7 +139,7 @@ class dbprocess():
 		query_add_schedule = "INSERT INTO SCHEDULE (starttime, endtime, repeat_id, dayofweek) VALUES (%s, %s, %s ,%s)"
 		cur.execute(query_add_schedule, (start, end, repeat, dow))
 		schedule_id = g.db.insert_id()
-		flash("Add new schedule: " + str(schedule_id))
+		# flash("Add new schedule: " + str(schedule_id))
 		return schedule_id
 
 	def add_state(self, uid, newstate):

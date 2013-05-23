@@ -100,7 +100,7 @@ $(document).ready(function(){
 });
 </script>
 <!-- Tags -->
-<link rel="stylesheet" href="http://jquery-tagbox.googlecode.com/hg/css/jquery.tagbox.css" />
+<link rel="stylesheet" href="/static/jquery.tagbox.css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
 <script src="http://jquery-tagbox.googlecode.com/hg/js/jquery.tagbox.js"></script>
 <script>
@@ -197,48 +197,43 @@ function show_map(position) {
 google.maps.event.addDomListener(window, 'load', init );
 
 </script>
+<script>
+$(document).ready(function(){
+  var curDateTextBox = $('#curdatetime');
+  curDateTextBox.datetimepicker();
+  curDateTextBox.datetimepicker("option", "dateFormat", 'yy-mm-dd');
+});
+</script>
 {% endblock %}
 {% block body %}
   <h2>{{ self.title() }}</h2>
-  {% if g.user %}
-    {% if request.endpoint == 'user_timeline' %}
-      <div class=followstatus>
-      {% if g.user == profile_user %}
-        This is you!
-      {% elif followed %}
-        You are currently following this user.
-        <a class=unfollow href="">Unfollow user</a>.
-      {% else %}
-        You are not yet following this user.
-        <a class=follow href="">Follow user</a>.
-      {% endif %}
-      </div>
-    {% elif request.endpoint == 'timeline' or request.endpoint == 'write_notes' %}
+  {% if g.uid %}
+    {% if request.endpoint == 'public_timeline' or request.endpoint == 'write_notes' %}
       <div class=twitbox>
         <h3>What's on your mind {{ session.username }}?</h3>
         <form action="{{ url_for('write_notes') }}" method=post>
           <!-- Words -->
-          <p><input type=text name=words size=60 value={{ form_content.words }}><!--
+          <p><input type=text name=words size=60 style="width:585px;" value={{ form_content.words }}><!--
           --><input type=submit value="Share">
-          <!-- Link -->
-          <div>Hyperlink:<input name="link" type="text" style="width:200px;"></div>
-          <!-- Location and Radius -->
           <div>
-            Location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >
-            Radius:<input name="radius" type="text" value="500"></div>
+          <!-- Location and Radius -->
+            Location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >&nbsp;&nbsp;
+            Radius:<input name="radius" type="text" style="width:40px;" value="500">&nbsp;&nbsp;
+          <!-- Link -->
+          Link:<input name="link" type="text" style="width:173px;"></div>
           <!-- Schedule -->
           <div>Schedule:
             <select id="repeat_sel", name="repeat_sel">
               {% for rep in repeat %}
               <option value={{ rep.id }}>{{ rep.type }}</option>
               {% endfor %}
-            </select>
+            </select>&nbsp;&nbsp;
             <span id="datetime">
-            <input type="text" id="startdatetime" name="startdatetime" value=""> 
-            <input type="text" id="enddatetime" name="enddatetime" value="">
+            Start:<input type="text" style="width:110px;" id="startdatetime" name="startdatetime" value=""> &nbsp;&nbsp;
+            End:<input type="text" style="width:110px;" id="enddatetime" name="enddatetime" value="">
             </span><span id="time" style="display:none">
-            <input type="text" id="starttime" name="starttime" value=""> 
-            <input type="text" id="endtime" name="endtime" value="">
+            Start:<input type="text" style="width:110px;" id="starttime" name="starttime" value=""> &nbsp;&nbsp;
+            End:<input type="text" style="width:110px;" id="endtime" name="endtime" value="">&nbsp;&nbsp;
             </span>
             <select id="dow_sel" name='dow_sel' style="display:none">
               {% for dow in dayofweek %}
@@ -248,15 +243,26 @@ google.maps.event.addDomListener(window, 'load', init );
           </div>
           <!-- Tags -->
           <div>
-            <label for="jquery-tagbox-select">Select Or Add New Tags:</label>
-            <select name="" id="jquery-tagbox-select-options">
+            <label style="vertical-align:top;" for="jquery-tagbox-select">Select or Add Tags:</label>
+            <select style="vertical-align: top;" name="" id="jquery-tagbox-select-options">
               {% for tag in tags %}
               <option value={{ tag.name }}>{{ tag.name }}</option>
               {% endfor %}
             </select><!--select#-->
-            <input type="text" id="jquery-tagbox-select" name="jquery-tagbox-select"><br><br>
-            <input type="text" id="jquery-tagbox-text" name="jquery-tagbox-text">
+            <input  type="text" id="jquery-tagbox-select" name="jquery-tagbox-select">
+            <input type="text" style="width:110px;" id="jquery-tagbox-text" name="jquery-tagbox-text">
           </div>
+        </form>
+      </div>
+      <br>
+      {% elif request.endpoint == 'timeline' %}
+      <div class=twitbox>
+        <form action="{{ url_for('timeline') }}" method="post">
+          <h3>Current state: {{ g.state }}</h3>
+          <!-- Location and Time -->
+          Set Location: <input type="text" id="curloc" name="curloc" style="width:230px;" onclick="openwin()" >
+          &nbsp;&nbsp;|&nbsp;&nbsp;Set Time: <input type="text" id="curdatetime" name="curdatetime"> 
+          &nbsp;&nbsp;<input type="submit" value="refresh">
         </form>
       </div>
     {% endif %}

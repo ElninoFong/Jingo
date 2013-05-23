@@ -12,15 +12,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 process = dbprocess()
 
-user = {'uid': 1,
-		'username': 'James',
-		'email': 'James@gmail.com',
-		'profile_id': 6,
-		'last_loc_id': 1,
-		'last_loc_name': 'Polytechnic Institute of New York University',
-		'state_id': 19,
-		'state_name': 'at work'}
-
 
 def connect_db():
 	return mdb.connect('127.0.0.1', 'root', 'root', 'Jingo_DB', port=8889)
@@ -29,12 +20,19 @@ def connect_db():
 @app.before_request
 def before_request():
 	g.db = connect_db()
-	g.user = None
+	g.uid = None
+	g.locid = None
+	g.stateid = None
+	g.state = None
 	if 'username' in session:
-		g.user = query_db('select uid from USER where username = %s',
+		res = query_db('SELECT uid, last_location_id, last_state_id FROM USER WHERE username = %s',
 						  [session['username']], one=True)
-		# g.state = query_db('select state_name from STATE where uid = %s',
-		# 					[g.user])
+		g.uid, g.locid, g.stateid = res
+	if g.stateid:
+		res = query_db('SELECT state_name FROM STATE WHERE state_id = %s AND uid = %s',
+							[g.stateid, g.uid], one=True)
+		g.state = res[0]
+
 		
 @app.teardown_request
 def teardown_request(exception):
@@ -75,15 +73,54 @@ def gravatar_url(email, size=80):
 		(md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def timeline():
 	"""Shows a users timeline or if no user is logged in it will
 	redirect to the public timeline.  This timeline shows the user's
 	messages as well as all the messages of followed users.
 	"""
-	if not g.user:
+	if not g.uid:
 		return redirect(url_for('public_timeline'))
 
+	cur = g.db.cursor()
+	if request.method == 'POST':
+		if g.stateid:
+			query_rec = "CALL recnotesproc (%s, %s, %s, %s)"
+			# curlocid = g.locid
+			# curlocname = user['last_loc_name']
+			curdatetime = str(datetime.now().replace(second=0, microsecond=0))
+			if request.form['curdatetime']:
+				curdatetime = str(request.form['curdatetime'])
+			curlocid = process.get_location_id(request.form['curloc'])
+			process.update_loc(g.uid, curlocid)
+			g.locid = curlocid
+			# curlocname = re.split('; |, ', request.form['curloc'])[0]
+			cur.execute(query_rec, (g.stateid, curlocid, curdatetime, PER_PAGE))
+			results = cur.fetchall()
+		else:
+			flash("Please set your state first.")
+			results = []
+	else:
+		if not g.stateid or not g.locid:
+			flash("Please set your state and location first.")
+			results = []
+		else:
+			query_rec = "CALL recnotesproc (%s, %s, %s, %s)"
+			curdatetime = str(datetime.now().replace(second=0, microsecond=0))
+			cur.execute(query_rec, (g.stateid, g.locid, curdatetime, PER_PAGE))
+			results = cur.fetchall()
+
+	messages=[]
+	for res in results:
+		messages.append({'email': res[0], 'username': res[1], 'words': res[2], 'created_at': res[3].strftime('%Y-%m-%d @ %H:%M')})
+	return render_template('timeline.html',
+		state = state,
+		messages=messages)
+
+
+@app.route('/public')
+def public_timeline():
+	"""Displays the latest messages of all users."""
 	form_content = {'words': '',
 					'startdatetime': '',
 					'enddatetime': '',
@@ -94,8 +131,8 @@ def timeline():
 					'addtag': ''}
 	cur = g.db.cursor()
 	query_data = "SELECT email, username, words, NOTE.created_at FROM NOTE, USER WHERE NOTE.uid = USER.uid \
-		AND USER.uid = %s ORDER BY NOTE.created_at DESC LIMIT %s"
-	cur.execute(query_data, (g.user[0], PER_PAGE))
+		ORDER BY NOTE.created_at DESC LIMIT %s"
+	cur.execute(query_data, (PER_PAGE,))
 	results = cur.fetchall()
 	messages=[]
 	for res in results:
@@ -108,42 +145,10 @@ def timeline():
 		messages=messages)
 
 
-@app.route('/public')
-def public_timeline():
-	"""Displays the latest messages of all users."""
-	cur = g.db.cursor()
-	# query_field = "SHOW FIELDS FROM NOTE"
-	query_data = "SELECT email, username, words, NOTE.created_at FROM NOTE, USER WHERE NOTE.uid = USER.uid \
-		ORDER BY NOTE.created_at DESC LIMIT %s"
-	# cur.execute(query_field)
-	# fields = [row[0] for row in cur.fetchall()]
-	cur.execute(query_data, (PER_PAGE,))
-	results = cur.fetchall()
-	messages=[]
-	for res in results:
-		messages.append({'email': res[0], 'username': res[1], 'words': res[2], 'created_at': res[3].strftime('%Y-%m-%d @ %H:%M')})
-	return render_template('timeline.html', messages=messages)
-
-
-@app.route('/add_message', methods=['POST'])
-def add_message():
-	"""Registers a new message for the user."""
-	if 'user_id' not in session:
-		abort(401)
-	# if request.form['text']:
-	#     db = get_db()
-	#     db.execute('''insert into message (author_id, text, pub_date)
-	#       values (?, ?, ?)''', (session['user_id'], request.form['text'],
-	#                             int(time.time())))
-	#     db.commit()
-	#     flash('Your message was recorded')
-	return redirect(url_for('timeline'))
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	"""Logs the user in."""
-	if g.user:
+	if g.uid:
 		return redirect(url_for('timeline'))
 	error = None
 	if request.method == 'POST':
@@ -166,7 +171,7 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 	"""Registers the user."""
-	if g.user:
+	if g.uid:
 		return redirect(url_for('timeline'))
 	error = None
 	if request.method == 'POST':
@@ -194,7 +199,7 @@ def register():
 	
 @app.route('/profile',methods=['GET', 'POST'])
 def profile():
-	if not g.user:
+	if not g.uid:
 		abort(401)
 	if request.method == 'POST':
 		cur = g.db.cursor()
@@ -217,7 +222,7 @@ def profile():
 	
 @app.route('/friends',methods=['GET', 'POST'])
 def friends():
-	if not g.user:
+	if not g.uid:
 		abort(401)
 	cur = g.db.cursor()
 	query = "SELECT U1.username,F.request_time \
@@ -267,55 +272,55 @@ def user_timeline(username):
 	if profile_user is None:
 		abort(404)
 	cur = g.db.cursor()
-	query = "SELECT username,words,N.created_at \
-	FROM NOTE AS N JOIN USER AS U \
-	WHERE N.uid=U.uid and username = '%s'" % username
-	# flash(query)
-	cur.execute(query)
-	results = [row[:] for row in cur.fetchall()]
-	
-	return render_template('timeline.html',results=results, 
+	query_data = "SELECT email, username, words, NOTE.created_at FROM NOTE, USER WHERE NOTE.uid = USER.uid \
+		AND username = %s ORDER BY NOTE.created_at DESC LIMIT %s"
+	cur.execute(query_data, (username, PER_PAGE))
+	results = cur.fetchall()
+	messages=[]
+	for res in results:
+		messages.append({'email': res[0], 'username': res[1], 'words': res[2], 'created_at': res[3].strftime('%Y-%m-%d @ %H:%M')})
+	return render_template('timeline.html', messages=messages,
 		profile_user=profile_user, profile_username=username)
 
 
-@app.route('/friendsreq/<uname>')
-def friendsreq(uname):
-	if not g.user:
-		abort(401)
-	flash('Friend Request Sent.')
-	cur = g.db.cursor()
-	query = "INSERT INTO `Jingo_DB`.`FRIENDSHIP` (`from_uid`, `to_uid`, `request_time`, `response_time`, `response_status`) VALUES ((select uid from USER where username = '%s'), (select uid from USER where username = '%s'), CURRENT_TIMESTAMP, '0000-00-00 00:00:00', '0')" % (session['username'],uname)
-	cur.execute(query)
-	g.db.commit()
+# @app.route('/friendsreq/<uname>')
+# def friendsreq(uname):
+# 	if not g.uid:
+# 		abort(401)
+# 	flash('Friend Request Sent.')
+# 	cur = g.db.cursor()
+# 	query = "INSERT INTO `Jingo_DB`.`FRIENDSHIP` (`from_uid`, `to_uid`, `request_time`, `response_time`, `response_status`) VALUES ((select uid from USER where username = '%s'), (select uid from USER where username = '%s'), CURRENT_TIMESTAMP, '0000-00-00 00:00:00', '0')" % (session['username'],uname)
+# 	cur.execute(query)
+# 	g.db.commit()
 	
-	return redirect(url_for('friends'))
+# 	return redirect(url_for('friends'))
 
 
-@app.route('/rejectreq/<uname>')
-def rejectreq(uname):
-	if not g.user:
-		abort(401)
-	flash('Rejected the Friend Request.')
-	cur = g.db.cursor()
-	query = "update FRIENDSHIP SET RESPONSE_STATUS = 2 \
-	WHERE from_uid = (SELECT  uid FROM USER      WHERE username = '%s' )" % uname
-	flash(query)
-	cur.execute(query)
-	g.db.commit()
-	return redirect(url_for('friends'))
+# @app.route('/rejectreq/<uname>')
+# def rejectreq(uname):
+# 	if not g.uid:
+# 		abort(401)
+# 	flash('Rejected the Friend Request.')
+# 	cur = g.db.cursor()
+# 	query = "update FRIENDSHIP SET RESPONSE_STATUS = 2 \
+# 	WHERE from_uid = (SELECT  uid FROM USER      WHERE username = '%s' )" % uname
+# 	flash(query)
+# 	cur.execute(query)
+# 	g.db.commit()
+# 	return redirect(url_for('friends'))
 	
-@app.route('/agreereq/<uname>')
-def agreereq(uname):
-	if not g.user:
-		abort(401)
-	flash('Friend Request Accepted.')
-	cur = g.db.cursor()
-	query = "update FRIENDSHIP SET RESPONSE_STATUS = 1 \
-	WHERE from_uid = (SELECT  uid FROM USER      WHERE username = '%s' )" % uname
-	flash(query)
-	cur.execute(query)
-	g.db.commit()
-	return redirect(url_for('friends'))
+# @app.route('/agreereq/<uname>')
+# def agreereq(uname):
+# 	if not g.uid:
+# 		abort(401)
+# 	flash('Friend Request Accepted.')
+# 	cur = g.db.cursor()
+# 	query = "update FRIENDSHIP SET RESPONSE_STATUS = 1 \
+# 	WHERE from_uid = (SELECT  uid FROM USER      WHERE username = '%s' )" % uname
+# 	flash(query)
+# 	cur.execute(query)
+# 	g.db.commit()
+# 	return redirect(url_for('friends'))
 
 
 
@@ -327,27 +332,9 @@ def logout():
 	return redirect(url_for('timeline'))
 
 
-@app.route('/show_all_notes')
-def show_all_notes():
-	cur = g.db.cursor()
-	query_field = "SHOW FIELDS FROM NOTE"
-	query_data = "SELECT * FROM NOTE"
-	flash(query_data)
-	cur.execute(query_field)
-	fields = [row[0] for row in cur.fetchall()]
-	cur.execute(query_data)
-	results = cur.fetchall()
-	return render_template('show_notes.html',
-		user = user,
-		state = state,
-		title = 'Show All Notes',
-		table = 'NOTES',
-		fields = fields,
-		results = results)
-
 @app.route('/write_notes', methods=['POST'])
 def write_notes():
-	if not g.user:
+	if not g.uid:
 		abort(401)
 	form_content = {'words': '',
 					'startdatetime': '',
@@ -373,10 +360,11 @@ def write_notes():
 			selecttag = request.form['jquery-tagbox-select'].split(',')
 			addtag = request.form['jquery-tagbox-text'].split(',')
 			loc_id = process.get_location_id(loc=request.form['loc'])
+			process.update_loc(g.uid, loc_id)
 			schedule_id = process.get_schedule_id(repeat=request.form['repeat_sel'], startdatetime=request.form['startdatetime'],
 												  enddatetime=request.form['enddatetime'], starttime=request.form['starttime'], 
 												  endtime=request.form['endtime'], dow=request.form['dow_sel'])
-			process.insert_note(uid=g.user[0], words=request.form['words'], link=request.form['link'], loc_id=loc_id, 
+			process.insert_note(uid=g.uid, words=request.form['words'], link=request.form['link'], loc_id=loc_id, 
 								radius=request.form['radius'], schedule_id=schedule_id, selecttag=selecttag, addtag=addtag)
 			flash('Your note was recorded')
 			return redirect(url_for('timeline'))
@@ -386,54 +374,6 @@ def write_notes():
 		tags = tags,
 		form_content = form_content)
 
-@app.route('/recieve_notes', methods = ['GET', 'POST'])
-def recieve_notes():
-	cur = g.db.cursor()
-	query_field = "SHOW FIELDS FROM NOTE"
-	query_rec = "CALL recnotesproc (%s, %s, %s)"
-	cur.execute(query_field)
-	fields = [row[0] for row in cur.fetchall()]
-	curlocid = user['last_loc_id']
-	curlocname = user['last_loc_name']
-	curdatetime = str(datetime.now().replace(second=0, microsecond=0))
-	if request.method == 'POST':
-		if request.form['curdatetime']:
-			curlocid = process.get_location_id(request.form['curloc'])
-			g.db.commit()
-			curlocname = re.split('; |, ', request.form['curloc'])[0]
-			curdatetime = str(request.form['curdatetime'])
-		else:
-			curlocid = process.get_location_id(request.form['curloc'])
-			g.db.commit()
-			curlocname = re.split('; |, ', request.form['curloc'])[0]
-	cur.execute(query_rec, (user['state_id'], curlocid, curdatetime))
-	results = cur.fetchall()
-	flash(user['username'] + " in '" + str(curlocname) + "' at '" + str(datetime.now().replace(microsecond=0)) + "' recieve following notes.")
-	return render_template('show_notes.html',
-		user = user,
-		state = state,
-		title = 'Show Recieve Notes',
-		table = 'NOTES',
-		fields = fields,
-		results = results)
-
-@app.route('/my_notes')
-def my_notes():
-	cur = g.db.cursor()
-	query_field = "SHOW FIELDS FROM NOTE"
-	query_my = "SELECT * FROM NOTE WHERE uid = %s"
-	cur.execute(query_field)
-	fields = [row[0] for row in cur.fetchall()]
-	cur.execute(query_my, (user['uid'],))
-	results = cur.fetchall()
-	flash(user['username'] + " published following notes.")
-	return render_template('show_notes.html',
-		user = user,
-		state = state,
-		title = 'Show My Notes',
-		table = 'NOTES',
-		fields = fields,
-		results = results)
 
 @app.route('/filter', methods=['GET', 'POST'])
 def filter():
@@ -445,24 +385,24 @@ def filter():
 			flash("State is required.")
 			valid = False
 		elif request.form['state_sel']:
-			cur.execute("SELECT state_id FROM STATE WHERE uid = %s AND state_name = %s", (user['uid'], request.form['state_sel']))
+			cur.execute("SELECT state_id FROM STATE WHERE uid = %s AND state_name = %s", (g.uid, request.form['state_sel']))
 			results = cur.fetchone()
 			if results is not None:
 				state_id = results[0]
 			else:
-				state_id = process.add_state(user['uid'], request.form['state_sel'])    # add state to db
-			user['state_id'] = state_id
-			user['state_name'] = request.form['state_sel']
+				state_id = process.add_state(g.uid, request.form['state_sel'])    # add state to db
+			process.update_state(g.uid, state_id)
+			g.state = request.form['state_sel']
 		elif request.form['newstate']:
-			cur.execute("SELECT state_id FROM STATE WHERE uid = %s AND state_name = %s", (user['uid'], request.form['newstate']))
+			cur.execute("SELECT state_id FROM STATE WHERE uid = %s AND state_name = %s", (g.uid, request.form['newstate']))
 			results = cur.fetchone()
 			if results is not None:
 				state_id = results[0]
 			else:
-				state_id = process.add_state(user['uid'], request.form['newstate']) # add state to db
+				state_id = process.add_state(g.uid, request.form['newstate']) # add state to db
 				state.append(request.form['newstate'])
-			user['state_id'] = state_id
-			user['state_name'] = request.form['newstate']
+			process.update_state(g.uid, state_id)
+			g.state = request.form['newstate']
 
 		if not ((request.form['startdatetime'] and request.form['enddatetime']) or (request.form['starttime'] and request.form['endtime'])):
 			valid = False
@@ -477,18 +417,18 @@ def filter():
 				loc_id = process.get_location_id(loc=request.form['loc'])
 			else:
 				loc_id = None
+			process.update_loc(g.uid, loc_id)
 			selecttag = request.form['jquery-tagbox-select'].split(',')
 			addtag = request.form['jquery-tagbox-text'].split(',')
 			# add a new filter
 			process.add_filter(state_id=state_id, schedule_id=schedule_id, loc_id=loc_id, selecttag=selecttag, addtag=addtag)
-	fields = ['uid', 'username', 'state_id', 'state_name', 'filter_id', 'schedule_id', 'starttime', 'endtime', 'dow_name', 'location_id', 'location_name', 'tag_name']
-	query_filter = "SELECT uid, username, state_id, state_name, filter_id, schedule_id, starttime, endtime, dow_name, location_id, location_name, tag_name \
+	fields = ['NAME', 'STATE', 'START', 'END', 'DAYOFWEEK', 'LOCATION', 'TAG']
+	query_filter = "SELECT username, state_name, starttime, endtime, dow_name, location_name, tag_name \
 		FROM USER NATURAL JOIN STATE NATURAL JOIN FILTER NATURAL JOIN SCHEDULE NATURAL LEFT JOIN LOCATION NATURAL JOIN DAYOFWEEK NATURAL LEFT JOIN TAGS_IN_FILTER NATURAL LEFT JOIN TAG \
 		WHERE dayofweek = dow_id AND uid = %s"
-	cur.execute(query_filter, (user['uid'],))
+	cur.execute(query_filter, (g.uid,))
 	results = cur.fetchall()
 	return render_template('filter.html',
-		user = user,
 		dayofweek = dayofweek,
 		repeat = repeat,
 		tags = tags,
