@@ -1,43 +1,43 @@
 {% extends "layout.html" %}
 {% block body %}
-<h3>this is your profile</h3> 
-
-	
+<div class=twitbox>
+<h3>This is your profile</h3> <br>
 	{% if results %}
-		<div>
-			<table border="1">
+			<table border="0">
 			<tr>
-			<td>first name</td>
+			<td>First name: &nbsp;&nbsp; </td>
 			<td>{{ results[0][0] }}</td>
 			</tr>
 			<tr>
-			<td>last name</td>
+			<td>Last name: &nbsp;&nbsp; </td>
 			<td>{{ results[0][1] }}</td>
 			</tr>
 			<tr>
-			<td>gender</td>
+			<td>Gender: </td>
 			<td>{{ results[0][2] }}</td>
 			</tr>
-			<td>email</td>
+			<td>Email: </td>
 			<td>{{ results[0][3] }}</td>
 			</tr>
 			</table><br>
 		</div>
+		<div class=twitbox>
 		<form action="{{ url_for('profile') }}" method="post">
-<h3>edit your profile</h3>
-		  <dl>
+<h3>Edit your profile</h3>
+		  <dl sytle="horizontal-align:left;">
 			<dt>Last name:<input type="text" name="lname">
-			<dt>first name:<input type="text" name="fname">
-			<dt>email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="email">
-			<dt>gender:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="gender" value = "male">male<br>
-			<dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="gender" value = "female">female<br>
+			<dt>First name:<input type="text" name="fname">
+			<dt>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="email">
+			<dt>Gender:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="gender" value = "male">Male<br>
+			<dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="radio" name="gender" value = "female">Female<br>
 		    			<dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input type="submit" value="edit" >
+				<input type="submit" value="Edit" >
 		
 		  </dl>
 		</form>
+	</div>
 	{% else %}
 		<p>No results.</p>
 	{% endif %}

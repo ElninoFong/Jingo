@@ -214,7 +214,7 @@ $(document).ready(function(){
         <form action="{{ url_for('write_notes') }}" method=post>
           <!-- Words -->
           <p><input type=text name=words size=60 style="width:585px;" value={{ form_content.words }}><!--
-          --><input type=submit value="Share">
+          --><input type=submit name="shareBtn" value="Share">
           <div>
           <!-- Location and Radius -->
             Location:<input type="text" id="curloc" name="loc" style="width:200px;" onclick="openwin()" >&nbsp;&nbsp;
@@ -254,6 +254,13 @@ $(document).ready(function(){
           </div>
         </form>
       </div>
+
+      <div class=twitbox>
+        <form action="{{ url_for('write_notes') }}" method=post>
+        <h3>Search Notes:
+        <input type="text" name="search" style="width:200px;">&nbsp;&nbsp;<input type="submit" name="searchBtn" value=" Search ">
+        </h3></form>
+      </div>
       <br>
       {% elif request.endpoint == 'timeline' %}
       <div class=twitbox>
@@ -267,6 +274,7 @@ $(document).ready(function(){
       </div>
     {% endif %}
   {% endif %}
+
   <ul class=messages>
   {% for message in messages %}
     <li><img src="{{ message.email|gravatar(size=48) }}"><p>
@@ -274,6 +282,8 @@ $(document).ready(function(){
       }}">{{ message.username }}</a></strong>
       {{ message.words }}
       <small>&mdash; {{ message.created_at }}</small>
+      <small>&nbsp;| &nbsp;<a href="{{ url_for('comment',noteid=message.noteid) }}"><em>comment</em></a></small>
+      <small>&nbsp;| &nbsp;<a href="{{ url_for('popular', noteid=message.noteid) }}"><em>like</em></a></small>
   {% else %}
     <li><em>There's no notes so far.</em>
   {% endfor %}

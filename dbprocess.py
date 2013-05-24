@@ -53,7 +53,7 @@ class dbprocess():
 		query_add_note = "INSERT INTO NOTE (uid, words, hyperlink, location_id, radius, schedule_id) VALUES (%s, %s, %s, %s, %s, %s)"
 		cur.execute(query_add_note, (uid, words, link, loc_id, radius, schedule_id))
 		note_id = g.db.insert_id()
-		flash("Write a new note: " + str(note_id))
+		# flash("Write a new note: " + str(note_id))
 		# flash(cur.lastrowid)
 
 		# add tags_in_note
@@ -103,7 +103,7 @@ class dbprocess():
 		query_add_filter = "INSERT INTO FILTER (state_id, location_id, filter_radius, schedule_id) VALUES (%s, %s, %s, %s)"
 		cur.execute(query_add_filter, (state_id, loc_id, filter_radius, schedule_id))
 		filter_id = g.db.insert_id()
-		flash("Add a new filter: " + str(filter_id))
+		# flash("Add a new filter: " + str(filter_id))
 
 		# add tags_in_filter
 		query_add_tags_in_filter = "INSERT INTO TAGS_IN_FILTER (filter_id, tag_id) VALUES (%s, %s)"
@@ -148,7 +148,7 @@ class dbprocess():
 		cur.execute(query_add_state, (uid, newstate))
 		state_id = g.db.insert_id()
 		g.db.commit()
-		flash("Add new state: " + newstate + ", id: " + str(state_id))
+		# flash("Add new state: " + newstate + ", id: " + str(state_id))
 		return state_id
 
 	def cal_distance(self, loc_id1, loc_id2):

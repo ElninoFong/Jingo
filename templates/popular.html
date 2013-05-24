@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Popular{% endblock %}
+{% block body %}
+ <h2>Popular</h2>
+  <ul class=messages>
+  {% for message in messages %}
+    <li><img src="{{ message.email|gravatar(size=48) }}"><p>
+      <strong><a href="{{ url_for('user_timeline', username=message.username)
+      }}">{{ message.username }}</a></strong>
+      {{ message.words }}
+      <small>&mdash; {{ message.created_at }}</small>
+      <small>&nbsp;| &nbsp;<a href="{{ url_for('comment',noteid=message.noteid) }}"><em>comment</em></a></small>
+      <small>&nbsp;| &nbsp;<a href="{{ url_for('popular', noteid=message.noteid) }}"><em>like({{ message.cnt }})</em></a></small>
+  {% else %}
+    <li><em>There's no notes so far.</em>
+  {% endfor %}
+  </ul>
+{% endblock %}

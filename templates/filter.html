@@ -186,7 +186,7 @@ function show_map(position) {
   });
 }
 
-google.maps.event.addDomListener(window, 'load', init );
+// google.maps.event.addDomListener(window, 'load', init );
 
 </script>
 {% endblock %}
@@ -241,17 +241,16 @@ google.maps.event.addDomListener(window, 'load', init );
 	<br>
 	<div class=twitbox>
 	{% if results %}
-		<table>
-			<caption>{{ table }}</caption>
+		<table style="border: 1px solid #ccc;">
       <tr>
       {% for field in fields %}
-			<th>{{ field }}</th>
+			<th style="border: 1px solid #ccc;">{{ field }}</th>
       {% endfor %}
       </tr>
 			{% for res in results %}
 			<tr>
 			{% for col in res %}
-			<td>{{ col }}</td>
+			<td style="border: 1px solid #ccc;">{{ col }}</td>
 			{% endfor %}
 			</tr>
 			{% endfor %}

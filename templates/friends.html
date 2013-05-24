@@ -2,19 +2,19 @@
 {% block body %}
 
 {% if results3 %}
+	<div class=twitbox>
   <h2>Here are requests!!</h2>
-	<div>
-		<table border="1">
+		<table style="border: 1px solid #ccc;">
 		<tr>
-		<td>name</td>
-		<td>time</td>
-		<td>process</td>
+		<td style="border: 1px solid #ccc;">name</td>
+		<td style="border: 1px solid #ccc;">time</td>
+		<td style="border: 1px solid #ccc;">process</td>
 		</tr>
 		{% for res in results3 %}
 		<tr>
-		<td>{{ res[0] }}</td>
-		<td>{{ res[1] }}</td>		
-	    <td><a href="{{ url_for('agreereq',uname = res[0]) }}" > agree</a>
+		<td style="border: 1px solid #ccc;">{{ res[0] }}</td>
+		<td style="border: 1px solid #ccc;">{{ res[1] }}</td>		
+	    <td style="border: 1px solid #ccc;"><a href="{{ url_for('agreereq',uname = res[0]) }}" > agree</a>
 		<a href="{{ url_for('rejectreq',uname = res[0]) }}" > reject</a>
 	    </td>
 		</tr>
@@ -24,20 +24,20 @@
 {% endif %}
 		   
 	
-   <h2> Your friends</h2>
+		<div class=twitbox>
+   <h2> Your friend list</h2>
 	{% if results %}
-		<div>
-			<table border='1'>
-				<tr><th> friends </th></tr>
+			<table style="border: 1px solid #ccc;">
+				<tr><th style="border: 1px solid #ccc;"> friends </th></tr>
 				{% for res in results %}
-					<tr> <td>
+					<tr> <td style="border: 1px solid #ccc;">
 					<a href="{{ url_for('user_timeline',username=res)  }}">{{ res }}</a>
 					</td> </tr>
 				{% endfor %}
 			</table>
 		</div>
 	{% else %}
-		<p>No results.</p>
+		<p>Sorry, no friends.</p>
 	{% endif %}
 
 
@@ -47,11 +47,11 @@
   </dl>
 </form>
 {% if results1 %}
-	<div>
-		<table border='1'>
-			<tr><th> name </th></tr>
+	<div class=twitbox>
+		<table style="border: 1px solid #ccc;">
+			<tr><th style="border: 1px solid #ccc;"> name </th></tr>
 			{% for res in results1 %}
-				<tr> <td>
+				<tr> <td style="border: 1px solid #ccc;">
 				<a href="{{ url_for('friendsreq', uname=res)  }}">{{ res }}</a>
 				</td> </tr>
 			{% endfor %}

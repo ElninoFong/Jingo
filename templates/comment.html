@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block title %}Comment{% endblock %}
+{% block body %}
+ <h2>Comment</h2>
+  <ul class=messages>
+  {% for message in messages %}
+    <li><img src="{{ message.email|gravatar(size=48) }}"><p>
+      <strong><a href="{{ url_for('user_timeline', username=message.username)
+      }}">{{ message.username }}</a></strong>
+      {{ message.words }}
+      <small>&mdash; {{ message.created_at }}</small>
+      <small>&nbsp;| &nbsp;<a href="{{ url_for('popular', noteid=message.noteid) }}"><em>like</em></a></small>
+  {% else %}
+    <li><em>No such note.</em>
+  {% endfor %}
+  </ul><br>
+
+  <div class=twitbox>
+    <form action="{{ url_for('comment',noteid=noteid) }}" method=post>
+    <h3>Add your comment:</h3>
+    <input type="text" name="comment_text" style="width:500px;">&nbsp;&nbsp;<input type="submit">
+    </form>
+  </div>
+  <br>
+
+   <ul class=messages>
+  {% for comm in comments %}
+    <li><img src="{{ comm.email|gravatar(size=48) }}"><p>
+      <strong><a href="{{ url_for('user_timeline', username=comm.username)
+      }}">{{ comm.username }}</a></strong>
+      {{ comm.content }}
+      <small>&mdash; {{ comm.created_at }}</small>
+  {% else %}
+    <li><em>No comment yet.</em>
+  {% endfor %}
+  </ul><br>
+
+{% endblock %}

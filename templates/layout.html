@@ -8,6 +8,7 @@
   {% if g.uid %}
     <a href="{{ url_for('timeline') }}">my timeline</a> |
     <a href="{{ url_for('public_timeline') }}">public timeline</a> |
+    <a href="{{ url_for('popular', noteid=-1) }}">popular</a> |
     <a href="{{ url_for('filter') }}">filter</a> |
 	  <a href="{{ url_for('friends') }}">friends</a> |
 	  <a href="{{ url_for('profile') }}">profile</a> |
